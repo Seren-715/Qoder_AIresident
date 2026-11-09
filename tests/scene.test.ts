@@ -34,4 +34,20 @@ describe('场景数据', () => {
     expect(EXTERIOR_DOOR.left + EXTERIOR_DOOR.width).toBeLessThanOrEqual(100);
     expect(EXTERIOR_DOOR.top + EXTERIOR_DOOR.height).toBeLessThanOrEqual(100);
   });
+
+  it('除门以外每件家具都有动作、气泡和画面内的热点区域', () => {
+    for (const [id, spot] of Object.entries(FURNITURE)) {
+      if (id === 'door') {
+        expect(spot.action).toBeUndefined();
+        continue;
+      }
+      expect(spot.action).toBeDefined();
+      expect(spot.action!.bubble.length).toBeGreaterThan(0);
+      const a = spot.action!.area;
+      expect(a.left).toBeGreaterThanOrEqual(0);
+      expect(a.top).toBeGreaterThanOrEqual(0);
+      expect(a.left + a.width).toBeLessThanOrEqual(100);
+      expect(a.top + a.height).toBeLessThanOrEqual(100);
+    }
+  });
 });

@@ -22,13 +22,53 @@ export interface Anchor {
   y: number;
 }
 
-export const FURNITURE: Record<FurnitureId, { name: string; anchor: Anchor }> = {
-  bed: { name: '床', anchor: { x: 17, y: 28 } },
-  bowl: { name: '饭碗', anchor: { x: 26, y: 86 } },
-  bookshelf: { name: '书架', anchor: { x: 11, y: 70 } },
-  desk: { name: '书桌', anchor: { x: 48, y: 60 } },
-  window: { name: '窗户', anchor: { x: 27, y: 32 } },
-  rug: { name: '地毯', anchor: { x: 48, y: 80 } },
+export interface Rect {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+export interface FurnitureAction {
+  pose: DuckPose;
+  bubble: string;
+  area: Rect;
+}
+
+export const FURNITURE: Record<
+  FurnitureId,
+  { name: string; anchor: Anchor; action?: FurnitureAction }
+> = {
+  bed: {
+    name: '床',
+    anchor: { x: 17, y: 28 },
+    action: { pose: 'sleep', bubble: '在床上睡觉', area: { left: 3, top: 16, width: 21, height: 17 } },
+  },
+  bowl: {
+    name: '饭碗',
+    anchor: { x: 28, y: 87 },
+    action: { pose: 'eat', bubble: '在吃饭', area: { left: 18, top: 76, width: 12, height: 16 } },
+  },
+  bookshelf: {
+    name: '书架',
+    anchor: { x: 11, y: 70 },
+    action: { pose: 'read', bubble: '在看书', area: { left: 3, top: 40, width: 14, height: 27 } },
+  },
+  desk: {
+    name: '书桌',
+    anchor: { x: 48, y: 60 },
+    action: { pose: 'sit', bubble: '在写代码', area: { left: 36, top: 42, width: 22, height: 24 } },
+  },
+  window: {
+    name: '窗户',
+    anchor: { x: 29.5, y: 34 },
+    action: { pose: 'back', bubble: '在窗边发呆', area: { left: 24, top: 10, width: 10, height: 19 } },
+  },
+  rug: {
+    name: '地毯',
+    anchor: { x: 48, y: 80 },
+    action: { pose: 'play', bubble: '在地毯上打滚', area: { left: 32, top: 69, width: 33, height: 23 } },
+  },
   door: { name: '门', anchor: { x: 90, y: 72 } },
 };
 
@@ -38,7 +78,7 @@ export const SCENES: Record<SceneId, { label: string; image: string; caption: st
   interior: {
     label: '屋内',
     image: 'art/room-interior.webp',
-    caption: '树洞小屋：床、书架、书桌、地毯和饭碗，都是小黄鸭自己布置的。',
+    caption: '树洞小屋：点床、书架、书桌、窗户、饭碗或地毯，小黄鸭会过去做对应的事。',
   },
   exterior: {
     label: '屋外',
