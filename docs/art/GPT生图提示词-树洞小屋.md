@@ -10,7 +10,7 @@
 
 1. **改成横版**：作品是网页，主要在电脑上看。手机竖屏时，前端只显示画面的一部分，并自动对准鸭子所在的位置。
 2. **电脑朝向**：屏幕朝墙、凳子朝镜头，鸭子坐上去时是**背对我们写代码**，看得到它在敲键盘。
-3. **家具摆放更合理**：东西都要落在地面、桌面或墙上，不要悬空；阁楼加矮栏杆，绳梯从阁楼的开口垂下来；书架嵌进阁楼下方的壁龛里。
+3. **家具摆放更合理**：鸭子要用的东西都放在它够得着的高度——树节孔窗移到阁楼床边，记忆墙移到门边和任务公告板并排（「旅行角」：揭任务 → 出门 → 回来钉明信片），高处只挂提灯和干草药作装饰；东西都要落在地面、桌面或墙上，不要悬空；阁楼加矮栏杆，绳梯从阁楼的开口垂下来；书架嵌进阁楼下方的壁龛里。
 
 布局线框图：[`layout-treehouse-landscape.png`](layout-treehouse-landscape.png)。黄色编号是鸭子出现的位置，红色虚线框留给界面。
 
@@ -33,15 +33,15 @@ Use the first image I uploaded ONLY as the art style reference (keep exactly the
 A cozy web game background: a dollhouse cutaway view of the INSIDE of a hollow old tree beside a pond, seen from a slightly high angle, like looking into a dollhouse with the front wall removed. Curved warm wooden inner walls with growth rings. No characters, no animals, no ducks.
 
 Layout from left to right:
-- Upper left: a wooden plank loft with a low wooden railing, a small bed with a dusty-blue quilt on it. A rope ladder hangs down from an opening at the right edge of the loft to the floor.
+- Upper left: a wooden plank loft with a low wooden railing, a small bed with a dusty-blue quilt on it. Right next to the bed, at loft height, a round knothole window letting in soft light, so the bed is beside the window. A rope ladder hangs down from an opening at the right edge of the loft to the floor.
 - Lower left, under the loft: a bookshelf built into a niche in the wall, packed with old books and scrolls.
-- Top center, on the wall: postcards and instant photos hanging on twine with tiny clips. To its right, a round knothole window letting in soft light.
+- Upper center: the hollow narrows upward like a dome; nothing is mounted high on the walls. Only a lantern and a few bundles of dried herbs hang from the top on strings.
 - Center: a small desk made from a tree stump, standing against the back wall. On it, a tiny old laptop whose SCREEN FACES THE WALL (we see the back of the laptop lid), a desk lamp and a mug. A small round stool in front of the desk, on the viewer's side, so someone sitting there would be seen from behind.
-- Right wall: a cork board with pinned task cards and a hand-drawn map.
+- Right side, a small travel corner near the doorway, everything mounted LOW on the wall at the height of a small duck: a cork board with pinned task cards and a hand-drawn map, and next to it a memory wall of postcards and instant photos hanging on two strings of twine with tiny clips.
 - Far right: a big arched doorway formed by tree roots, opening onto the pond, with lily pads and a small wooden dock visible outside.
 - Floor: packed earth and thick roots. A round woven straw rug in the center. In the lower left corner, a small pool of clear pond water between the roots with duckweed, and a small food bowl on the floor beside it.
 - Every object rests on the floor, a table, a shelf or the wall; nothing floats in the air.
-- Leave small empty spots on the bed, on the stool, in the middle of the rug, at the edge of the pool and next to the bowl. Keep the top-left corner, top-right corner and bottom-center edge simple, because UI will cover them.
+- Everything a small duck needs to use is placed low, within its reach. Leave small empty spots on the bed, on the stool, in the middle of the rug, at the edge of the pool and next to the bowl. Keep the top-left corner, top-right corner and bottom-center edge simple, because UI will cover them.
 
 Art style: same as the reference image. Hand-drawn picture-book illustration, thin dark brown outlines of even weight, slightly wobbly. Flat color fills, shadows only one slightly darker flat shade, no gradients, no glossy highlights, no realistic lighting. Subtle paper grain. Muted low-saturation palette of warm wood browns, beige, moss green and dusty blue.
 
@@ -58,15 +58,15 @@ Avoid: portrait composition, exterior view, characters or animals, mushroom stai
 网页游戏背景：池塘边老树的树洞「内部」，娃娃屋剖面视角，略从上方看进去。弧形暖色木头内壁，有年轮。没有任何角色、动物或鸭子。
 
 从左到右：
-- 左上：带矮木栏杆的木板阁楼，上面有一张盖着雾蓝色被子的小床；阁楼右侧开口处垂下一架绳梯到地面。
+- 左上：带矮木栏杆的木板阁楼，上面有一张盖着雾蓝色被子的小床；床边、和阁楼同一高度有一个圆形树节孔窗，透进柔和的光；阁楼右侧开口处垂下一架绳梯到地面。
 - 左下（阁楼下方）：嵌在墙壁壁龛里的书架，塞满旧书和卷轴。
-- 中上墙面：麻绳小夹子挂着明信片和拍立得；右边一个圆形树节孔窗，透进柔和的光。
+- 中上方：树洞向上收窄成穹顶，高处墙上不挂任何东西，只从顶上用绳子垂下一盏提灯和几束干草药。
 - 中间：靠后墙的树墩小书桌，桌上一台小旧笔记本电脑，屏幕朝墙（我们看到的是电脑背面）、台灯和马克杯；书桌前、靠观众这一侧放一张小圆凳，坐在上面的人是背对我们的。
-- 右墙：软木板，钉着任务卡片和手绘地图。
+- 右侧靠近门的「旅行角」，所有东西都挂在**小鸭子够得着的低处**：一块软木任务板，钉着任务卡片和手绘地图；旁边是记忆墙，两串麻绳和小夹子挂着明信片和拍立得。
 - 最右：树根形成的大拱门，通向池塘，门外有荷叶和小木码头。
 - 地面：压实的泥土和粗树根，中央一块圆形草编地毯；左下角树根之间一小汪清澈池水和浮萍，旁边地上一个小饭碗。
 - 所有东西都放在地面、桌面、架子或墙上，不要悬空。
-- 床上、凳子上、地毯中央、水边、饭碗旁各留一小块空位。左上角、右上角和底部中间保持简单，界面会盖在那里。
+- 小鸭子要用的东西都放在它够得着的低处。床上、凳子上、地毯中央、水边、饭碗旁各留一小块空位。左上角、右上角和底部中间保持简单，界面会盖在那里。
 
 画风：和参考图一致。手绘绘本插画，深棕色细描边，粗细统一、略带手抖；扁平上色，阴影只用深一档的纯色，无渐变、无高光、无写实光影；淡淡纸张颗粒；低饱和的暖木棕、米色、苔绿、雾蓝。
 
@@ -121,7 +121,7 @@ The room: curved warm wooden inner walls with visible growth rings and bark text
 - Floor: packed earth and thick tree roots, a round woven straw rug in the middle; in the lower left, a small pool of clear pond water between the roots with a few duckweed leaves, and a small food bowl beside it; in the lower right, an arched doorway between the roots opening onto the pond, with lily pads and a small wooden dock visible outside.
 - Foreground: a few curved roots and reeds at the bottom edge for depth.
 - Many small handmade objects: clay jars, dried flowers, a yarn ball, small potted plants, rope, a lantern. Cluttered but tidy, lived-in.
-- Leave small empty spots on the bed, in front of the desk, in the middle of the rug, at the edge of the water and next to the bowl. Keep the four corners of the image simple.
+- Everything a small duck needs to use is placed low, within its reach. Leave small empty spots on the bed, in front of the desk, in the middle of the rug, at the edge of the water and next to the bowl. Keep the four corners of the image simple.
 
 Art style: hand-drawn picture-book illustration for a cozy idle mobile game. Thin dark brown outlines of even weight, slightly wobbly and imperfect like drawn with a fine pen. Flat color fills; shadows are just one slightly darker flat shade, no gradients, no glossy highlights, no realistic lighting. Subtle paper grain texture. Muted, low-saturation palette: warm grey, beige, ochre and natural wood brown, moss and sage green, dusty blue, with tiny accents of coral red and mustard yellow. Simple, charming shapes; calm, quiet, cozy mood.
 

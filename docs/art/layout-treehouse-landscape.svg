@@ -34,33 +34,43 @@
   <g stroke="#5a4632" stroke-width="3"><line x1="70" y1="500" x2="270" y2="500"/><line x1="70" y1="570" x2="270" y2="570"/></g>
   <text x="90" y="625" font-size="22" fill="#f3e6d3">书架（Wiki）</text>
 
-  <!-- 记忆墙 -->
-  <rect x="640" y="90" width="330" height="150" rx="8" fill="#ead7bd" stroke="#5a4632" stroke-width="3" stroke-dasharray="10 6"/>
-  <path d="M650 120 Q805 150 960 120" fill="none" stroke="#5a4632" stroke-width="3"/>
-  <g fill="#fff" stroke="#5a4632" stroke-width="2"><rect x="670" y="130" width="46" height="38"/><rect x="740" y="138" width="46" height="38"/><rect x="810" y="138" width="46" height="38"/><rect x="880" y="130" width="46" height="38"/></g>
-  <text x="680" y="222" font-size="22" fill="#5a4632">记忆墙（Memory）</text>
+  <!-- 上方：树洞向上收窄，只放装饰 -->
+  <path d="M640 330 Q700 120 900 90 Q1100 120 1160 330" fill="none" stroke="#5a4632" stroke-width="4" stroke-dasharray="12 8"/>
+  <line x1="900" y1="90" x2="900" y2="190" stroke="#5a4632" stroke-width="3"/>
+  <rect x="880" y="190" width="40" height="50" rx="8" fill="#f2c46b" stroke="#5a4632" stroke-width="3"/>
+  <g stroke="#5a4632" stroke-width="3"><line x1="780" y1="110" x2="780" y2="170"/><line x1="1020" y1="110" x2="1020" y2="170"/></g>
+  <g fill="#9bb07a" stroke="#5a4632" stroke-width="2"><ellipse cx="780" cy="180" rx="16" ry="22"/><ellipse cx="1020" cy="180" rx="16" ry="22"/></g>
+  <text x="700" y="290" font-size="20" fill="#5a4632">上方：树洞向上收窄，挂提灯和干草药（纯装饰）</text>
 
-  <!-- 树节孔窗 -->
-  <circle cx="1080" cy="160" r="70" fill="#cfe3ea" stroke="#5a4632" stroke-width="6"/>
-  <text x="1035" y="168" font-size="22" fill="#4b6b78">树节孔窗</text>
+  <!-- 树节孔窗：移到阁楼床边 -->
+  <circle cx="520" cy="240" r="52" fill="#cfe3ea" stroke="#5a4632" stroke-width="6"/>
+  <text x="482" y="246" font-size="18" fill="#4b6b78">树节孔窗</text>
+  <text x="478" y="318" font-size="16" fill="#5a4632">（在床边）</text>
 
   <!-- 书桌：电脑屏幕朝墙，凳子朝镜头 -->
-  <rect x="650" y="440" width="260" height="110" rx="10" fill="#a77b52" stroke="#5a4632" stroke-width="4"/>
-  <path d="M735 400 L825 400 L815 445 L745 445 Z" fill="#6d6d6d" stroke="#333" stroke-width="3"/>
-  <text x="664" y="530" font-size="20" fill="#f3e6d3">树墩书桌 · 电脑屏幕朝墙</text>
-  <rect x="740" y="575" width="80" height="40" rx="8" fill="#c99a6c" stroke="#5a4632" stroke-width="3"/>
-  <text x="732" y="640" font-size="18" fill="#5a4632">小凳（鸭子背对镜头）</text>
+  <rect x="620" y="440" width="260" height="110" rx="10" fill="#a77b52" stroke="#5a4632" stroke-width="4"/>
+  <path d="M705 400 L795 400 L785 445 L715 445 Z" fill="#6d6d6d" stroke="#333" stroke-width="3"/>
+  <text x="634" y="530" font-size="20" fill="#f3e6d3">树墩书桌 · 电脑屏幕朝墙</text>
+  <rect x="710" y="575" width="80" height="40" rx="8" fill="#c99a6c" stroke="#5a4632" stroke-width="3"/>
+  <text x="702" y="640" font-size="18" fill="#5a4632">小凳（鸭子背对镜头）</text>
 
-  <!-- 任务公告板 -->
-  <rect x="1060" y="290" width="230" height="150" rx="8" fill="#d8b98e" stroke="#5a4632" stroke-width="4"/>
-  <g fill="#fffaf0" stroke="#5a4632" stroke-width="2"><rect x="1080" y="310" width="54" height="44"/><rect x="1150" y="318" width="54" height="44"/><rect x="1220" y="310" width="54" height="44"/></g>
-  <text x="1070" y="420" font-size="20" fill="#5a4632">任务公告板（Quest）</text>
+  <!-- 旅行角：任务公告板 + 记忆墙，都在鸭子够得着的高度 -->
+  <rect x="940" y="400" width="170" height="150" rx="8" fill="#d8b98e" stroke="#5a4632" stroke-width="4"/>
+  <g fill="#fffaf0" stroke="#5a4632" stroke-width="2"><rect x="955" y="415" width="44" height="38"/><rect x="1010" y="422" width="44" height="38"/><rect x="1060" y="415" width="38" height="34"/></g>
+  <text x="950" y="500" font-size="18" fill="#5a4632">任务公告板</text>
+  <text x="950" y="525" font-size="18" fill="#5a4632">（Quest）</text>
+  <rect x="1130" y="380" width="230" height="190" rx="8" fill="#ead7bd" stroke="#5a4632" stroke-width="3" stroke-dasharray="10 6"/>
+  <path d="M1140 410 Q1245 435 1350 410" fill="none" stroke="#5a4632" stroke-width="3"/>
+  <path d="M1140 480 Q1245 505 1350 480" fill="none" stroke="#5a4632" stroke-width="3"/>
+  <g fill="#fff" stroke="#5a4632" stroke-width="2"><rect x="1155" y="418" width="40" height="34"/><rect x="1215" y="424" width="40" height="34"/><rect x="1280" y="418" width="40" height="34"/><rect x="1180" y="490" width="40" height="34"/></g>
+  <text x="1140" y="555" font-size="18" fill="#5a4632">记忆墙（Memory）</text>
+  <text x="940" y="370" font-size="20" fill="#5a4632">旅行角：揭任务 → 出门 → 回来钉明信片</text>
 
   <!-- 门洞（树根拱门，通池塘和码头） -->
-  <path d="M1340 860 L1340 520 Q1450 380 1560 520 L1560 860 Z" fill="#a9cbd6" stroke="#5a4632" stroke-width="8"/>
-  <rect x="1360" y="700" width="180" height="40" fill="#a77b52" stroke="#5a4632" stroke-width="3"/>
-  <text x="1372" y="600" font-size="24" fill="#2f5664">树根拱门</text>
-  <text x="1372" y="632" font-size="20" fill="#2f5664">→ 池塘、小码头</text>
+  <path d="M1380 860 L1380 540 Q1475 410 1565 540 L1565 860 Z" fill="#a9cbd6" stroke="#5a4632" stroke-width="8"/>
+  <rect x="1395" y="700" width="160" height="40" fill="#a77b52" stroke="#5a4632" stroke-width="3"/>
+  <text x="1400" y="610" font-size="22" fill="#2f5664">树根拱门</text>
+  <text x="1400" y="640" font-size="18" fill="#2f5664">→ 池塘、码头</text>
 
   <!-- 地毯 -->
   <ellipse cx="830" cy="730" rx="190" ry="70" fill="#e2c07e" stroke="#5a4632" stroke-width="4"/>
@@ -88,7 +98,7 @@
   <!-- 鸭子锚点 -->
   <g font-size="22" font-weight="bold">
     <circle cx="370" cy="230" r="24" fill="#ffd23f" stroke="#e8772e" stroke-width="5"/><text x="362" y="238" fill="#5a4632">1</text>
-    <circle cx="780" cy="570" r="24" fill="#ffd23f" stroke="#e8772e" stroke-width="5"/><text x="772" y="578" fill="#5a4632">2</text>
+    <circle cx="750" cy="570" r="24" fill="#ffd23f" stroke="#e8772e" stroke-width="5"/><text x="742" y="578" fill="#5a4632">2</text>
     <circle cx="880" cy="710" r="24" fill="#ffd23f" stroke="#e8772e" stroke-width="5"/><text x="872" y="718" fill="#5a4632">3</text>
     <circle cx="330" cy="700" r="24" fill="#ffd23f" stroke="#e8772e" stroke-width="5"/><text x="322" y="708" fill="#5a4632">4</text>
     <circle cx="180" cy="780" r="24" fill="#ffd23f" stroke="#e8772e" stroke-width="5"/><text x="172" y="788" fill="#5a4632">5</text>
