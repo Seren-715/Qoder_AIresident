@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { FURNITURE, IDLE_SPOT, SCENES, type FurnitureId } from '../src/data/scene';
+import { EXTERIOR_DOOR, FURNITURE, IDLE_SPOT, SCENES, type FurnitureId } from '../src/data/scene';
 
 const SPEC_IDS: FurnitureId[] = ['bed', 'bowl', 'bookshelf', 'desk', 'window', 'rug', 'door'];
 
@@ -26,5 +26,12 @@ describe('场景数据', () => {
 
   it('开局 idle 位置指向存在的家具', () => {
     expect(FURNITURE[IDLE_SPOT.furniture]).toBeDefined();
+  });
+
+  it('外景门热点完整落在画面内', () => {
+    expect(EXTERIOR_DOOR.left).toBeGreaterThanOrEqual(0);
+    expect(EXTERIOR_DOOR.top).toBeGreaterThanOrEqual(0);
+    expect(EXTERIOR_DOOR.left + EXTERIOR_DOOR.width).toBeLessThanOrEqual(100);
+    expect(EXTERIOR_DOOR.top + EXTERIOR_DOOR.height).toBeLessThanOrEqual(100);
   });
 });

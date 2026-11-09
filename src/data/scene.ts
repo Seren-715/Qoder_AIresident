@@ -43,9 +43,11 @@ export const SCENES: Record<SceneId, { label: string; image: string; caption: st
   exterior: {
     label: '屋外',
     image: 'art/room-exterior.webp',
-    caption: '小屋外面：菜地、池塘和一条通往远方的小路，旅行就从这里出发。',
+    caption: '小屋外面：菜地、池塘和一条通往远方的小路。点一下树洞门，进屋看看。',
   },
 };
+
+export const EXTERIOR_DOOR = { left: 41, top: 41, width: 9, height: 20 };
 
 export const IDLE_SPOT: { furniture: FurnitureId; pose: DuckPose; bubble: string } = {
   furniture: 'rug',
