@@ -82,6 +82,34 @@ Avoid: a door or door panel in the doorway, furniture visible through the doorwa
 
 ---
 
+## 屋内外对齐（11-10）
+
+两张图单独看都没问题，放在一起有三处对不上：
+
+| 对不上的地方 | 屋内图 | 屋外图 |
+|---|---|---|
+| 门在哪面墙 | 门在**右侧墙**上（屋内是「拆掉前墙」的视角，前墙上的东西看不到） | 门在树干**正面**、朝着我们 |
+| 门外是什么 | 门外紧挨着就是池塘和码头 | 门外是土路和草地，池塘在右前方，隔着一段距离 |
+| 门洞里面 | — | 一块平涂的黄色，像贴上去的，没有纵深 |
+
+**统一的设定**：门开在树干的**右侧**，朝向右边的小路、邮箱和池塘（出门就是旅行的方向）。屋外图把门挪到树干右侧，屋内图把门外的景色改成「先是土路，再远一点是池塘和码头」。
+
+### 改屋外图（在生成屋外图的对话里）
+
+```
+Keep everything else in the image exactly the same. Move the arched root doorway from the front of the trunk to the RIGHT side of the trunk, so we see it at an angle, facing right toward the mailbox, the path and the pond. Remove the old doorway on the front and fill it with plain bark. Inside the new doorway, show depth instead of a flat color: a dim warm interior getting darker toward the inside, a hint of the curved wooden inner wall and the edge of a round woven straw rug on the floor.
+```
+
+### 改屋内图（在生成屋内图的对话里）
+
+```
+Keep everything else in the image exactly the same. Only change the view through the arched doorway on the right: right outside the doorway there is a strip of dirt path and grass, and the pond with a small wooden dock is a little further away beyond the path, matching the outside of the house.
+```
+
+顺便可以一起改：「同时把书桌上的笔记本电脑转过来，屏幕朝墙，我们只看到电脑背面。」
+
+---
+
 # 第一版（已被第二版取代）
 
 ## 1. 布局思路
