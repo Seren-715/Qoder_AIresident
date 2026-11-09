@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="WenQuanYi Zen Hei, PingFang SC, Microsoft YaHei, sans-serif">
+  <!-- 屋外全景 · 横版布局线框图（16:9）。只表示位置关系，不是美术稿。 -->
+  <defs>
+    <pattern id="water" width="40" height="20" patternUnits="userSpaceOnUse">
+      <path d="M0 10 Q10 2 20 10 T40 10" fill="none" stroke="#7fa7b8" stroke-width="2"/>
+    </pattern>
+    <pattern id="rows" width="30" height="30" patternUnits="userSpaceOnUse">
+      <circle cx="15" cy="15" r="7" fill="#7f9e5a"/>
+    </pattern>
+  </defs>
+
+  <!-- 天空与远山 -->
+  <rect width="1600" height="900" fill="#dfe8e6"/>
+  <path d="M900 260 Q1050 170 1200 240 Q1330 160 1480 230 Q1550 210 1600 230 L1600 330 L900 330 Z" fill="#a9bfae" stroke="#5a4632" stroke-width="3"/>
+  <text x="1240" y="150" font-size="20" fill="#4f6656">远山（旅行的方向）</text>
+  <!-- 草地 -->
+  <path d="M0 300 Q800 260 1600 320 L1600 900 L0 900 Z" fill="#c9d3a4" stroke="#5a4632" stroke-width="3"/>
+
+  <!-- 道路：左右延伸，右侧通向远方 -->
+  <path d="M0 560 Q400 540 700 560 Q1000 580 1200 470 Q1350 380 1480 330 L1510 332 Q1390 400 1250 500 Q1050 630 700 620 Q400 610 0 640 Z" fill="#e6d2a6" stroke="#5a4632" stroke-width="4"/>
+  <text x="300" y="600" font-size="22" fill="#5a4632">← 小路通向菜园</text>
+  <text x="1200" y="640" font-size="22" fill="#5a4632">小路蜿蜒通向远方 ↗</text>
+
+  <!-- 大树 -->
+  <path d="M560 560 Q580 420 600 300 Q560 200 520 120 L900 120 Q860 200 820 300 Q840 420 880 560 Z" fill="#a77b52" stroke="#5a4632" stroke-width="5"/>
+  <ellipse cx="720" cy="110" rx="330" ry="110" fill="#8fae6d" stroke="#5a4632" stroke-width="5"/>
+  <text x="640" y="110" font-size="26" fill="#2f4524">树冠</text>
+  <circle cx="660" cy="300" r="34" fill="#cfe3ea" stroke="#5a4632" stroke-width="5"/>
+  <text x="612" y="362" font-size="18" fill="#f3e6d3">阁楼的窗</text>
+  <path d="M740 560 L740 450 Q790 390 840 450 L840 560 Z" fill="#7a5638" stroke="#5a4632" stroke-width="5"/>
+  <text x="752" y="520" font-size="20" fill="#f3e6d3">树根拱门</text>
+  <text x="640" y="430" font-size="24" fill="#f3e6d3">树屋</text>
+
+  <!-- 邮箱 + 路牌 -->
+  <rect x="930" y="470" width="50" height="34" rx="6" fill="#c76b4f" stroke="#5a4632" stroke-width="4"/>
+  <line x1="955" y1="504" x2="955" y2="560" stroke="#5a4632" stroke-width="6"/>
+  <text x="900" y="455" font-size="20" fill="#5a4632">邮箱（收明信片）</text>
+  <line x1="1110" y1="430" x2="1110" y2="540" stroke="#5a4632" stroke-width="6"/>
+  <path d="M1110 440 L1200 440 L1220 455 L1200 470 L1110 470 Z" fill="#d8b98e" stroke="#5a4632" stroke-width="3"/>
+  <path d="M1110 480 L1030 480 L1010 495 L1030 510 L1110 510 Z" fill="#d8b98e" stroke="#5a4632" stroke-width="3"/>
+  <text x="1060" y="410" font-size="20" fill="#5a4632">路牌（目的地）</text>
+
+  <!-- 菜园（左） -->
+  <rect x="40" y="330" width="420" height="200" rx="10" fill="#b8975f" stroke="#5a4632" stroke-width="4"/>
+  <rect x="60" y="350" width="180" height="70" fill="url(#rows)" stroke="#5a4632" stroke-width="2"/>
+  <rect x="260" y="350" width="180" height="70" fill="url(#rows)" stroke="#5a4632" stroke-width="2"/>
+  <rect x="60" y="440" width="180" height="70" fill="url(#rows)" stroke="#5a4632" stroke-width="2"/>
+  <rect x="260" y="440" width="180" height="70" fill="#a98a56" stroke="#5a4632" stroke-width="2"/>
+  <text x="290" y="485" font-size="18" fill="#f3e6d3">空地（以后可扩）</text>
+  <g stroke="#5a4632" stroke-width="4"><line x1="40" y1="330" x2="40" y2="530"/><line x1="460" y1="330" x2="460" y2="530"/></g>
+  <text x="60" y="320" font-size="24" fill="#5a4632">菜园（木栅栏围起来）</text>
+  <rect x="470" y="420" width="60" height="80" rx="6" fill="#9c7a55" stroke="#5a4632" stroke-width="3"/>
+  <text x="455" y="520" font-size="16" fill="#5a4632">工具棚/水壶</text>
+
+  <!-- 池塘与码头（正前方） -->
+  <path d="M380 900 Q420 700 700 690 Q1000 680 1150 760 Q1250 820 1240 900 Z" fill="#a9cbd6" stroke="#5a4632" stroke-width="5"/>
+  <path d="M380 900 Q420 700 700 690 Q1000 680 1150 760 Q1250 820 1240 900 Z" fill="url(#water)"/>
+  <rect x="800" y="640" width="70" height="170" fill="#b08c66" stroke="#5a4632" stroke-width="4"/>
+  <text x="882" y="700" font-size="20" fill="#5a4632">小码头</text>
+  <text x="520" y="800" font-size="26" fill="#2f5664">池塘（树屋正前方）</text>
+  <g fill="#8fae6d" stroke="#5a4632" stroke-width="2"><ellipse cx="1000" cy="770" rx="26" ry="12"/><ellipse cx="1070" cy="800" rx="22" ry="10"/><ellipse cx="620" cy="740" rx="22" ry="10"/></g>
+
+  <!-- 前景 -->
+  <text x="20" y="760" font-size="20" fill="#5a4632">前景：芦苇、野花</text>
+  <text x="1290" y="760" font-size="20" fill="#5a4632">前景：芦苇、石头</text>
+
+  <!-- 界面预留区 -->
+  <g fill="none" stroke="#c0392b" stroke-width="3" stroke-dasharray="8 6">
+    <rect x="16" y="16" width="330" height="90" rx="12"/>
+    <rect x="1350" y="16" width="234" height="90" rx="12"/>
+    <rect x="560" y="820" width="520" height="66" rx="12"/>
+  </g>
+  <g font-size="20" fill="#c0392b">
+    <text x="30" y="70">界面：名字 / 状态条</text>
+    <text x="1362" y="70">界面：快进 / 菜单</text>
+    <text x="580" y="860">界面：回屋 · 投喂 · 聊天 · 日记</text>
+  </g>
+
+  <!-- 鸭子锚点 -->
+  <g font-size="20" font-weight="bold">
+    <circle cx="200" cy="420" r="24" fill="#ffd23f" stroke="#e8772e" stroke-width="5"/><text x="192" y="427" fill="#5a4632">A</text>
+    <circle cx="835" cy="660" r="24" fill="#ffd23f" stroke="#e8772e" stroke-width="5"/><text x="827" y="667" fill="#5a4632">B</text>
+    <circle cx="1000" cy="730" r="24" fill="#ffd23f" stroke="#e8772e" stroke-width="5"/><text x="992" y="737" fill="#5a4632">C</text>
+    <circle cx="955" cy="590" r="24" fill="#ffd23f" stroke="#e8772e" stroke-width="5"/><text x="947" y="597" fill="#5a4632">D</text>
+    <circle cx="1420" cy="370" r="24" fill="#ffd23f" stroke="#e8772e" stroke-width="5"/><text x="1412" y="377" fill="#5a4632">E</text>
+  </g>
+</svg>
