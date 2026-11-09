@@ -1,9 +1,87 @@
-# GPT 生图提示词：树洞小屋（第二版）
+# GPT 生图提示词：树洞小屋
 
-> 第一版提示词交给 GPT 后，两张结果都不对。这一版针对那两张图的问题重写，按「画面格式 → 视角 → 场景 → 画风 → 禁止项」排序，越靠前 GPT 越重视。
-> **建议用英文版**：GPT 生图对英文的风格词理解更准。中文版供你核对内容。
+> **当前用第三版（横版）**，在本节。第二版（竖版）保留在后面作记录。
 
 ---
+
+## 第三版：横版（11-10）
+
+第二版生成的竖版图画风已经对了，这一版只改三件事：
+
+1. **改成横版**：作品是网页，主要在电脑上看。手机竖屏时，前端只显示画面的一部分，并自动对准鸭子所在的位置。
+2. **电脑朝向**：屏幕朝墙、凳子朝镜头，鸭子坐上去时是**背对我们写代码**，看得到它在敲键盘。
+3. **家具摆放更合理**：东西都要落在地面、桌面或墙上，不要悬空；阁楼加矮栏杆，绳梯从阁楼的开口垂下来；书架嵌进阁楼下方的壁龛里。
+
+布局线框图：[`layout-treehouse-landscape.png`](layout-treehouse-landscape.png)。黄色编号是鸭子出现的位置，红色虚线框留给界面。
+
+### 怎么生成（推荐「改图」，不要从零开始）
+
+画风已经满意了，最稳的做法是**在上次那个对话里**，或新开对话时**上传上次那张竖版图**，让 GPT 以它为画风基准重新构图：
+
+1. 上传上次满意的竖版图，再上传横版线框图。
+2. 说明：「第一张图只参考画风，第二张图只参考家具位置。」
+3. 在对话里说「**请生成横版图片**」（GPT 横版一般是 1536×1024，约 3:2；前端会裁成 16:9，上下各留一点余量即可）。
+4. 粘贴下面的提示词。
+
+### 英文提示词
+
+```
+Please generate a LANDSCAPE (horizontal) image.
+
+Use the first image I uploaded ONLY as the art style reference (keep exactly the same line work, flat coloring, paper grain and muted palette). Use the second image ONLY as the layout reference for where furniture goes. Do not copy the second image's colors or labels.
+
+A cozy web game background: a dollhouse cutaway view of the INSIDE of a hollow old tree beside a pond, seen from a slightly high angle, like looking into a dollhouse with the front wall removed. Curved warm wooden inner walls with growth rings. No characters, no animals, no ducks.
+
+Layout from left to right:
+- Upper left: a wooden plank loft with a low wooden railing, a small bed with a dusty-blue quilt on it. A rope ladder hangs down from an opening at the right edge of the loft to the floor.
+- Lower left, under the loft: a bookshelf built into a niche in the wall, packed with old books and scrolls.
+- Top center, on the wall: postcards and instant photos hanging on twine with tiny clips. To its right, a round knothole window letting in soft light.
+- Center: a small desk made from a tree stump, standing against the back wall. On it, a tiny old laptop whose SCREEN FACES THE WALL (we see the back of the laptop lid), a desk lamp and a mug. A small round stool in front of the desk, on the viewer's side, so someone sitting there would be seen from behind.
+- Right wall: a cork board with pinned task cards and a hand-drawn map.
+- Far right: a big arched doorway formed by tree roots, opening onto the pond, with lily pads and a small wooden dock visible outside.
+- Floor: packed earth and thick roots. A round woven straw rug in the center. In the lower left corner, a small pool of clear pond water between the roots with duckweed, and a small food bowl on the floor beside it.
+- Every object rests on the floor, a table, a shelf or the wall; nothing floats in the air.
+- Leave small empty spots on the bed, on the stool, in the middle of the rug, at the edge of the pool and next to the bowl. Keep the top-left corner, top-right corner and bottom-center edge simple, because UI will cover them.
+
+Art style: same as the reference image. Hand-drawn picture-book illustration, thin dark brown outlines of even weight, slightly wobbly. Flat color fills, shadows only one slightly darker flat shade, no gradients, no glossy highlights, no realistic lighting. Subtle paper grain. Muted low-saturation palette of warm wood browns, beige, moss green and dusty blue.
+
+Avoid: portrait composition, exterior view, characters or animals, mushroom stairs, stone walls, floating objects, a laptop screen facing the viewer, thick cartoon outlines, vector clip-art look, 3D rendering, saturated colors, text, labels, watermark, UI buttons.
+```
+
+### 中文对照（供核对）
+
+```
+请生成一张横版图片。
+
+第一张上传的图只作为画风参考（线条、扁平上色、纸张颗粒、低饱和配色完全保持一致）；第二张图只作为家具位置参考，不要照抄它的颜色和文字标注。
+
+网页游戏背景：池塘边老树的树洞「内部」，娃娃屋剖面视角，略从上方看进去。弧形暖色木头内壁，有年轮。没有任何角色、动物或鸭子。
+
+从左到右：
+- 左上：带矮木栏杆的木板阁楼，上面有一张盖着雾蓝色被子的小床；阁楼右侧开口处垂下一架绳梯到地面。
+- 左下（阁楼下方）：嵌在墙壁壁龛里的书架，塞满旧书和卷轴。
+- 中上墙面：麻绳小夹子挂着明信片和拍立得；右边一个圆形树节孔窗，透进柔和的光。
+- 中间：靠后墙的树墩小书桌，桌上一台小旧笔记本电脑，屏幕朝墙（我们看到的是电脑背面）、台灯和马克杯；书桌前、靠观众这一侧放一张小圆凳，坐在上面的人是背对我们的。
+- 右墙：软木板，钉着任务卡片和手绘地图。
+- 最右：树根形成的大拱门，通向池塘，门外有荷叶和小木码头。
+- 地面：压实的泥土和粗树根，中央一块圆形草编地毯；左下角树根之间一小汪清澈池水和浮萍，旁边地上一个小饭碗。
+- 所有东西都放在地面、桌面、架子或墙上，不要悬空。
+- 床上、凳子上、地毯中央、水边、饭碗旁各留一小块空位。左上角、右上角和底部中间保持简单，界面会盖在那里。
+
+画风：和参考图一致。手绘绘本插画，深棕色细描边，粗细统一、略带手抖；扁平上色，阴影只用深一档的纯色，无渐变、无高光、无写实光影；淡淡纸张颗粒；低饱和的暖木棕、米色、苔绿、雾蓝。
+
+不要：竖版构图、外景、角色或动物、蘑菇台阶、石头墙、悬空物件、屏幕朝向观众的电脑、粗卡通描边、矢量剪贴画风、3D 渲染、高饱和色、文字、标注、水印、界面按钮。
+```
+
+### 如果只差一点
+
+- 电脑还是朝着镜头：「保持其他不变，把笔记本电脑转过来，屏幕朝墙，我们只看到电脑背面。」
+- 凳子位置不对：「保持其他不变，把小圆凳放到书桌前、靠近观众的一侧。」
+- 某个东西悬空：「保持其他不变，把 XX 放到地上 / 桌上。」
+
+---
+
+# 第二版：竖版（已被第三版取代）
 
 ## 1. 上次两张图的问题
 
