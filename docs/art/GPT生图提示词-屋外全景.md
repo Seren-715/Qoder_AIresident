@@ -16,7 +16,7 @@
 | 一棵树太突兀 | 大树孤零零立在空旷草地上，不像有人（鸭）住的地方 | 树屋长在**一片树林的边缘**，是其中最老最大的一棵；树林左密右疏，右边留出开阔地给旅行的小路 |
 | 窗户里是树叶贴图 | GPT 把叶子画进了玻璃里 | 窗户玻璃反射天空、透出屋里的暖光；树叶来自**旁边真实垂下的树枝** |
 | 太空、没生活感 | 屋内图小物件很多，屋外几乎没有 | 门口加提灯、木柴堆、小长凳、花盆、晾衣绳 |
-| 门和屋内对不上 | 屋内是没有门板的树根拱门，屋外画成了普通木门 | 树根拱门 + 一扇**敞开着**的小木门 |
+| 门和屋内对不上 | 屋内是没有门板的树根拱门，屋外画成了普通木门 | 只有树根拱门，**没有门板**；门洞里只透出暖光和地毯一角，不画家具 |
 
 布局线框图已同步更新：[`layout-outdoor-landscape.png`](layout-outdoor-landscape.png)。
 
@@ -33,7 +33,7 @@ Use the first image I uploaded ONLY as the art style reference: keep exactly the
 
 A cozy web game background: the outside of a little duck's home at the edge of a small forest, seen from one consistent slightly elevated three-quarter view (everything drawn from the same angle). An asymmetric, natural composition, not a centered diagram. No characters, no animals, no ducks.
 
-- The home: the oldest and biggest tree at the edge of a forest, slightly left of center. Other smaller trees and bushes stand behind it and to its left, forming a forest backdrop that thins out toward the right. The home tree's roots form an arched doorway with a small wooden door left open. Higher on the trunk, a small round window: its glass reflects the sky and shows a warm light from inside, and a real leafy branch of the tree hangs beside it. No leaves painted inside the glass. Smooth bark only: no mushrooms, no shelf fungi, no stairs on the trunk.
+- The home: the oldest and biggest tree at the edge of a forest, slightly left of center. Other smaller trees and bushes stand behind it and to its left, forming a forest backdrop that thins out toward the right. The home tree's roots form an open arched doorway with NO door. Through the doorway we only see a soft warm dim interior and the edge of a round woven straw rug on the floor; no shelves, jars or furniture visible inside. Higher on the trunk, a small round window: its glass reflects the sky and shows a warm light from inside, and a real leafy branch of the tree hangs beside it. No leaves painted inside the glass. Smooth bark only: no mushrooms, no shelf fungi, no stairs on the trunk.
 - Lived-in details at the door: a hanging lantern, a small stack of firewood, a little wooden bench, flower pots, a short laundry line between the tree and a post.
 - A dirt path passes in front of the door and runs across the image: to the left it leads to the garden; to the right it winds toward the upper right, getting narrower and disappearing between soft distant hills, suggesting a long journey.
 - Left: a small vegetable garden with a low wooden fence at the forest edge: three beds of growing vegetables (carrots, cabbages, tomatoes on sticks) and one bed of bare soil, a tiny tool shed and a watering can.
@@ -45,7 +45,7 @@ A cozy web game background: the outside of a little duck's home at the edge of a
 
 Art style: same as the reference image. Hand-drawn picture-book illustration, thin dark brown outlines of even weight, slightly wobbly. Flat color fills, shadows only one slightly darker flat shade, no gradients, no glossy highlights, no realistic lighting. Subtle paper grain. Muted low-saturation palette: warm wood browns, beige, moss and sage green, dusty blue water, pale sky, with tiny accents of coral red and mustard yellow.
 
-Avoid: symmetric centered composition, a lone tree in an empty field, a dock pointing straight at the viewer, mixed perspectives, leaves drawn inside the window glass, portrait composition, interior view, characters or animals, mushrooms or shelf fungi on the tree, stairs on the trunk, text on the signpost, labels, thick cartoon outlines, vector clip-art look, 3D rendering, saturated colors, watermark, UI buttons.
+Avoid: a door or door panel in the doorway, furniture visible through the doorway, symmetric centered composition, a lone tree in an empty field, a dock pointing straight at the viewer, mixed perspectives, leaves drawn inside the window glass, portrait composition, interior view, characters or animals, mushrooms or shelf fungi on the tree, stairs on the trunk, text on the signpost, labels, thick cartoon outlines, vector clip-art look, 3D rendering, saturated colors, watermark, UI buttons.
 ```
 
 ### 中文对照（第二版）
@@ -57,7 +57,7 @@ Avoid: symmetric centered composition, a lone tree in an empty field, a dock poi
 
 网页游戏背景：小鸭子的家的外面，位于一片小树林的边缘。整张图用同一个「略高的斜侧视角」画，构图自然、不对称，不要像居中的示意图。没有任何角色、动物或鸭子。
 
-- 家：树林边缘最老最大的一棵树，位置略偏左。它后面和左边有其他较小的树和灌木，形成树林背景，越往右越稀疏。树根形成拱门，一扇小木门敞开着。树干高处一个小圆窗：玻璃反射天空、透出屋里的暖光，旁边垂下一根真实的带叶树枝。玻璃里不要画树叶。树干只有树皮：不要蘑菇、层状菌或台阶。
+- 家：树林边缘最老最大的一棵树，位置略偏左。它后面和左边有其他较小的树和灌木，形成树林背景，越往右越稀疏。树根形成敞开的拱门，没有门板。门洞里只看到柔和的暖光和地上圆形草编地毯的一角，不要画架子、罐子或其他家具。树干高处一个小圆窗：玻璃反射天空、透出屋里的暖光，旁边垂下一根真实的带叶树枝。玻璃里不要画树叶。树干只有树皮：不要蘑菇、层状菌或台阶。
 - 门口的生活细节：一盏挂着的提灯、一小堆木柴、一张小木长凳、几个花盆、树和木桩之间一段晾衣绳。
 - 一条土路从门前经过、横贯画面：往左通向菜园；往右向右上方蜿蜒，越来越窄，消失在远处柔和的山丘之间，像通向很远的地方。
 - 左边：树林边上低矮木栅栏围着的小菜园，三块菜畦（胡萝卜、白菜、搭竹竿的番茄）和一块空泥地，一个小工具棚和水壶。
@@ -69,11 +69,13 @@ Avoid: symmetric centered composition, a lone tree in an empty field, a dock poi
 
 画风：和参考图一致（同上）。
 
-不要：对称居中构图、空旷草地上孤零零一棵树、正对镜头的码头、混乱的透视、画在窗玻璃里的树叶、竖版、室内、角色或动物、树上的蘑菇或层状菌、树干台阶、路牌文字、标注、粗卡通描边、矢量剪贴画风、3D 渲染、高饱和色、水印、界面按钮。
+不要：门洞里的门板、门洞里能看到的家具、对称居中构图、空旷草地上孤零零一棵树、正对镜头的码头、混乱的透视、画在窗玻璃里的树叶、竖版、室内、角色或动物、树上的蘑菇或层状菌、树干台阶、路牌文字、标注、粗卡通描边、矢量剪贴画风、3D 渲染、高饱和色、水印、界面按钮。
 ```
 
 ### 如果只差一点
 
+- 画了门、门洞里的东西和屋内对不上（第二版第一次生成就出现了，原因是第二版最初写了「敞开的小木门」，已修正）：
+  「保持画面其他部分完全不变，只修改树根拱门：去掉门板，变成没有门的敞开拱门；门洞里只保留柔和的暖光和地上圆形草编地毯的一角，去掉里面的架子和罐子。」
 - 窗户又是贴图：「保持其他不变，窗玻璃里不要树叶，改成反射天空和透出暖光，在窗户旁边画一根真实垂下的树枝。」
 - 还是像一棵孤树：「保持其他不变，在大树后面和左边加一片较小的树和灌木，让它看起来长在树林边缘。」
 - 码头还是正对镜头：「保持其他不变，把码头改成从路边斜着伸进水里。」
