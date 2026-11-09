@@ -5,6 +5,83 @@
 
 ---
 
+## 第二版（11-10）：针对第一次生成结果的修改
+
+### 第一次结果的问题
+
+| 问题 | 原因 | 这一版怎么改 |
+|---|---|---|
+| 整体「怪」 | 构图完全对称：树在正中、码头笔直朝下、池塘居中，像一张示意图 | 改成不对称：池塘移到树屋**右前方**，码头**斜着**伸进水里 |
+| 视角混乱 | 树是正面平视，池塘和码头却像从正上方看 | 统一成「略高的斜侧视角」，所有东西都按同一个角度画 |
+| 一棵树太突兀 | 大树孤零零立在空旷草地上，不像有人（鸭）住的地方 | 树屋长在**一片树林的边缘**，是其中最老最大的一棵；树林左密右疏，右边留出开阔地给旅行的小路 |
+| 窗户里是树叶贴图 | GPT 把叶子画进了玻璃里 | 窗户玻璃反射天空、透出屋里的暖光；树叶来自**旁边真实垂下的树枝** |
+| 太空、没生活感 | 屋内图小物件很多，屋外几乎没有 | 门口加提灯、木柴堆、小长凳、花盆、晾衣绳 |
+| 门和屋内对不上 | 屋内是没有门板的树根拱门，屋外画成了普通木门 | 树根拱门 + 一扇**敞开着**的小木门 |
+
+布局线框图已同步更新：[`layout-outdoor-landscape.png`](layout-outdoor-landscape.png)。
+
+### 生成方法
+
+**新开一个对话**（避免受上一张影响），上传：① 屋内定稿图（画风参考）；② 更新后的屋外线框图（布局参考）。说「请生成横版图片」，再粘贴下面的提示词。
+
+### 英文提示词（第二版）
+
+```
+Please generate a LANDSCAPE (horizontal) image.
+
+Use the first image I uploaded ONLY as the art style reference: keep exactly the same thin dark brown wobbly outlines, flat coloring with one darker flat shade for shadows, paper grain texture and muted warm palette. Use the second image ONLY as the layout reference. Do not copy its colors, shapes or text labels.
+
+A cozy web game background: the outside of a little duck's home at the edge of a small forest, seen from one consistent slightly elevated three-quarter view (everything drawn from the same angle). An asymmetric, natural composition, not a centered diagram. No characters, no animals, no ducks.
+
+- The home: the oldest and biggest tree at the edge of a forest, slightly left of center. Other smaller trees and bushes stand behind it and to its left, forming a forest backdrop that thins out toward the right. The home tree's roots form an arched doorway with a small wooden door left open. Higher on the trunk, a small round window: its glass reflects the sky and shows a warm light from inside, and a real leafy branch of the tree hangs beside it. No leaves painted inside the glass. Smooth bark only: no mushrooms, no shelf fungi, no stairs on the trunk.
+- Lived-in details at the door: a hanging lantern, a small stack of firewood, a little wooden bench, flower pots, a short laundry line between the tree and a post.
+- A dirt path passes in front of the door and runs across the image: to the left it leads to the garden; to the right it winds toward the upper right, getting narrower and disappearing between soft distant hills, suggesting a long journey.
+- Left: a small vegetable garden with a low wooden fence at the forest edge: three beds of growing vegetables (carrots, cabbages, tomatoes on sticks) and one bed of bare soil, a tiny tool shed and a watering can.
+- Right of the door: a small red mailbox on a post beside the path, and a wooden signpost with blank arrow boards (no writing).
+- Foreground, to the right front of the tree: a calm pond with lily pads; a short wooden dock goes diagonally from the path into the water.
+- Background: soft distant hills on the right, a pale sky with a few simple clouds.
+- Foreground edges: reeds and wildflowers bottom left, reeds and stones bottom right.
+- Leave small empty spots: inside the garden, at the end of the dock, on the open water, beside the mailbox, and on the far part of the path. Keep the top-left corner, top-right corner and bottom-center edge simple, because UI will cover them.
+
+Art style: same as the reference image. Hand-drawn picture-book illustration, thin dark brown outlines of even weight, slightly wobbly. Flat color fills, shadows only one slightly darker flat shade, no gradients, no glossy highlights, no realistic lighting. Subtle paper grain. Muted low-saturation palette: warm wood browns, beige, moss and sage green, dusty blue water, pale sky, with tiny accents of coral red and mustard yellow.
+
+Avoid: symmetric centered composition, a lone tree in an empty field, a dock pointing straight at the viewer, mixed perspectives, leaves drawn inside the window glass, portrait composition, interior view, characters or animals, mushrooms or shelf fungi on the tree, stairs on the trunk, text on the signpost, labels, thick cartoon outlines, vector clip-art look, 3D rendering, saturated colors, watermark, UI buttons.
+```
+
+### 中文对照（第二版）
+
+```
+请生成一张横版图片。
+
+第一张图只作画风参考（深棕色手抖细描边、扁平上色、阴影只用深一档纯色、纸张颗粒、低饱和暖色调，完全保持一致）；第二张图只作位置关系参考，不照抄颜色、形状和文字。
+
+网页游戏背景：小鸭子的家的外面，位于一片小树林的边缘。整张图用同一个「略高的斜侧视角」画，构图自然、不对称，不要像居中的示意图。没有任何角色、动物或鸭子。
+
+- 家：树林边缘最老最大的一棵树，位置略偏左。它后面和左边有其他较小的树和灌木，形成树林背景，越往右越稀疏。树根形成拱门，一扇小木门敞开着。树干高处一个小圆窗：玻璃反射天空、透出屋里的暖光，旁边垂下一根真实的带叶树枝。玻璃里不要画树叶。树干只有树皮：不要蘑菇、层状菌或台阶。
+- 门口的生活细节：一盏挂着的提灯、一小堆木柴、一张小木长凳、几个花盆、树和木桩之间一段晾衣绳。
+- 一条土路从门前经过、横贯画面：往左通向菜园；往右向右上方蜿蜒，越来越窄，消失在远处柔和的山丘之间，像通向很远的地方。
+- 左边：树林边上低矮木栅栏围着的小菜园，三块菜畦（胡萝卜、白菜、搭竹竿的番茄）和一块空泥地，一个小工具棚和水壶。
+- 门的右边：路旁木桩上一个红色小邮箱；一个木头路牌，箭头板上没有字。
+- 前景、树屋右前方：一片平静的池塘和荷叶；一条短木码头从路边斜着伸进水里。
+- 背景：右侧远处柔和的山丘，淡色天空和几朵简单的云。
+- 前景边缘：左下芦苇和野花，右下芦苇和石头。
+- 留空位：菜园里、码头尽头、开阔水面、邮箱旁、小路远端。左上角、右上角和底部中间保持简单，界面会盖在那里。
+
+画风：和参考图一致（同上）。
+
+不要：对称居中构图、空旷草地上孤零零一棵树、正对镜头的码头、混乱的透视、画在窗玻璃里的树叶、竖版、室内、角色或动物、树上的蘑菇或层状菌、树干台阶、路牌文字、标注、粗卡通描边、矢量剪贴画风、3D 渲染、高饱和色、水印、界面按钮。
+```
+
+### 如果只差一点
+
+- 窗户又是贴图：「保持其他不变，窗玻璃里不要树叶，改成反射天空和透出暖光，在窗户旁边画一根真实垂下的树枝。」
+- 还是像一棵孤树：「保持其他不变，在大树后面和左边加一片较小的树和灌木，让它看起来长在树林边缘。」
+- 码头还是正对镜头：「保持其他不变，把码头改成从路边斜着伸进水里。」
+
+---
+
+# 第一版（已被第二版取代）
+
 ## 1. 布局思路
 
 从左到右一条小路贯穿画面，树屋在中间，池塘在树屋正前方：
