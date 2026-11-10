@@ -26,3 +26,10 @@ coverage/
 .idea/
 .DS_Store
 Thumbs.db
+
+# 早前部署会话的一次性工具与中间产物
+__pycache__/
+*.pyc
+/library_file_transfer.py
+/library_hosted_apps.py
+/*.b64
