@@ -1,4 +1,5 @@
 import { sendChat, type ChatTurn } from '../ai/client';
+import { loadAiConfig } from '../storage/settings';
 
 export interface ChatPanel {
   open(): void;
@@ -60,7 +61,7 @@ export function mountChat(): ChatPanel {
     input.disabled = true;
     append('user', message);
     loading.hidden = false;
-    const { reply } = await sendChat(message, history.slice(-12));
+    const { reply } = await sendChat(message, history.slice(-12), loadAiConfig());
     loading.hidden = true;
     append('assistant', reply);
     history.push({ role: 'user', content: message }, { role: 'assistant', content: reply });

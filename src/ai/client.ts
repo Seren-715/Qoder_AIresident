@@ -1,4 +1,5 @@
 import { pickFallback } from './fallback';
+import type { AiConfig } from '../data/ai';
 
 export interface ChatTurn {
   role: 'user' | 'assistant';
@@ -10,6 +11,7 @@ const TIMEOUT_MS = 20000;
 export async function sendChat(
   message: string,
   history: ChatTurn[],
+  config?: AiConfig,
 ): Promise<{ reply: string; fallback: boolean }> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -18,7 +20,7 @@ export async function sendChat(
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ message, history }),
+      body: JSON.stringify({ message, history, config }),
       signal: controller.signal,
     });
     if (!response.ok || response.redirected) throw new Error('bad status');

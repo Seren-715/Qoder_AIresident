@@ -42,4 +42,13 @@ describe('聊天客户端', () => {
     })));
     expect((await sendChat('hi', [])).fallback).toBe(true);
   });
+
+  it('把 API 配置随请求传给 Function', async () => {
+    const fetchMock = vi.fn(async (_url: string, _init: RequestInit) => jsonResponse({ ok: true, reply: '嘎' }));
+    vi.stubGlobal('fetch', fetchMock);
+    const config = { baseUrl: 'https://api.deepseek.com', model: 'deepseek-chat' };
+    await sendChat('hi', [], config);
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body as string);
+    expect(body.config).toEqual(config);
+  });
 });

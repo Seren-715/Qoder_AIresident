@@ -76,4 +76,41 @@ describe('聊天 Function', () => {
     expect(res.status).toBe(502);
     expect(await res.json()).toEqual({ ok: false, code: 'upstream_unavailable' });
   });
+
+  it('拒绝不可信接口地址，Secret 不外发', async () => {
+    setKey('test-key');
+    const res = await handler(
+      post({ message: 'hi', config: { baseUrl: 'https://evil.example.com', model: 'x' } }),
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ ok: false, code: 'invalid_input' });
+  });
+
+  it('可信地址与模型随请求生效', async () => {
+    setKey('test-key');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        new Response(JSON.stringify({ choices: [{ message: { content: '嘎' } }] }), {
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    );
+    const res = await handler(
+      post({
+        message: 'hi',
+        config: { baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1/', model: 'qwen-plus' },
+      }),
+    );
+    expect(res.status).toBe(200);
+    const call = vi.mocked(fetch).mock.calls[0];
+    expect(String(call[0])).toBe('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions');
+    expect(JSON.parse((call[1] as RequestInit).body as string).model).toBe('qwen-plus');
+  });
+
+  it('拒绝超长模型名', async () => {
+    setKey('test-key');
+    const res = await handler(post({ message: 'hi', config: { model: 'x'.repeat(65) } }));
+    expect(res.status).toBe(400);
+  });
 });

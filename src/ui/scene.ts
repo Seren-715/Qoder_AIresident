@@ -11,6 +11,7 @@ import {
 } from '../data/scene';
 import { WATER, clipPath } from '../data/water';
 import { mountChat } from './chat';
+import { mountSettings } from './settings';
 
 export function mountScene(root: HTMLElement): void {
   root.innerHTML = `
@@ -116,6 +117,7 @@ export function mountScene(root: HTMLElement): void {
   }
   setDuck(FURNITURE[IDLE_SPOT.furniture].anchor, IDLE_SPOT.pose, IDLE_SPOT.bubble);
   const chat = mountChat();
+  mountSettings(sceneEl);
   duck.addEventListener('click', () => chat.open());
   duck.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {

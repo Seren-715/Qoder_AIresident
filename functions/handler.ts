@@ -3,7 +3,9 @@ const SYSTEM_PROMPT =
 
 const MAX_MESSAGE = 500;
 const MAX_HISTORY = 12;
+const MAX_MODEL = 64;
 const UPSTREAM_TIMEOUT_MS = 15000;
+const TRUSTED_HOSTS = ['api.deepseek.com', 'dashscope.aliyuncs.com'];
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -17,7 +19,9 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-function parseInput(data: unknown): { message: string; history: ChatMessage[] } | null {
+function parseInput(
+  data: unknown,
+): { message: string; history: ChatMessage[]; baseUrl?: string; model?: string } | null {
   if (!data || typeof data !== 'object') return null;
   const body = data as Record<string, unknown>;
   if (typeof body.message !== 'string') return null;
@@ -34,7 +38,31 @@ function parseInput(data: unknown): { message: string; history: ChatMessage[] } 
       history.push({ role: m.role, content: m.content });
     }
   }
-  return { message, history };
+  let baseUrl: string | undefined;
+  let model: string | undefined;
+  if (body.config !== undefined) {
+    if (!body.config || typeof body.config !== 'object') return null;
+    const config = body.config as Record<string, unknown>;
+    if (config.baseUrl !== undefined) {
+      if (typeof config.baseUrl !== 'string') return null;
+      let parsed: URL;
+      try {
+        parsed = new URL(config.baseUrl);
+      } catch {
+        return null;
+      }
+      // The Secret key must never be sent to a caller-chosen untrusted host.
+      if (parsed.protocol !== 'https:' || !TRUSTED_HOSTS.includes(parsed.hostname)) return null;
+      baseUrl = config.baseUrl.replace(/\/+$/, '');
+    }
+    if (config.model !== undefined) {
+      if (typeof config.model !== 'string' || !config.model.trim() || config.model.length > MAX_MODEL) {
+        return null;
+      }
+      model = config.model.trim();
+    }
+  }
+  return { message, history, baseUrl, model };
 }
 
 export async function handler(request: Request): Promise<Response> {
@@ -53,8 +81,11 @@ export async function handler(request: Request): Promise<Response> {
   const env = (globalThis as { Deno?: { env: { get(name: string): string | undefined } } }).Deno?.env;
   const apiKey = env?.get('LLM_API_KEY');
   if (!apiKey) return json({ ok: false, code: 'service_not_configured' }, 503);
-  const base = (env?.get('LLM_BASE_URL') || 'https://api.deepseek.com').replace(/\/+$/, '');
-  const model = env?.get('LLM_MODEL') || 'deepseek-chat';
+  const base = (input.baseUrl || env?.get('LLM_BASE_URL') || 'https://api.deepseek.com').replace(
+    /\/+$/,
+    '',
+  );
+  const model = input.model || env?.get('LLM_MODEL') || 'deepseek-chat';
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
