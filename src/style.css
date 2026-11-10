@@ -153,7 +153,8 @@ h1 {
   transition: box-shadow 0.2s, background-color 0.2s;
 }
 
-.hotspot-door {
+.hotspot-door,
+.hotspot-door-in {
   border-radius: 50% 50% 6% 6% / 62% 62% 6% 6%;
 }
 

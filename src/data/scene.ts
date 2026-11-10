@@ -78,7 +78,7 @@ export const SCENES: Record<SceneId, { label: string; image: string; caption: st
   interior: {
     label: '屋内',
     image: 'art/room-interior.webp',
-    caption: '树洞小屋：点床、书架、书桌、窗户、饭碗或地毯，小黄鸭会过去做对应的事。',
+    caption: '树洞小屋：点床、书架、书桌、窗户、饭碗或地毯，小黄鸭会过去做对应的事；点右边拱门到屋外。',
   },
   exterior: {
     label: '屋外',
@@ -88,6 +88,8 @@ export const SCENES: Record<SceneId, { label: string; image: string; caption: st
 };
 
 export const EXTERIOR_DOOR = { left: 41, top: 41, width: 9, height: 20 };
+
+export const INTERIOR_DOOR = { left: 88, top: 45, width: 11, height: 34 };
 
 export const IDLE_SPOT: { furniture: FurnitureId; pose: DuckPose; bubble: string } = {
   furniture: 'rug',

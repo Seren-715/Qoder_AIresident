@@ -2,6 +2,7 @@ import {
   EXTERIOR_DOOR,
   FURNITURE,
   IDLE_SPOT,
+  INTERIOR_DOOR,
   SCENES,
   assetUrl,
   duckUrl,
@@ -24,6 +25,7 @@ export function mountScene(root: HTMLElement): void {
         <img class="duck-img" alt="小黄鸭" />
       </div>
       <button type="button" class="hotspot hotspot-door" aria-label="进入小屋"></button>
+      <button type="button" class="hotspot hotspot-door-in" aria-label="走出小屋"></button>
     </div>
     <div class="controls">
       <div class="switch" role="group" aria-label="切换场景">
@@ -39,6 +41,7 @@ export function mountScene(root: HTMLElement): void {
   const bg = root.querySelector<HTMLImageElement>('.scene-bg')!;
   const waterLayer = root.querySelector<HTMLElement>('.water-layer')!;
   const door = root.querySelector<HTMLButtonElement>('.hotspot-door')!;
+  const doorIn = root.querySelector<HTMLButtonElement>('.hotspot-door-in')!;
   const duck = root.querySelector<HTMLElement>('.duck')!;
   const duckImg = root.querySelector<HTMLImageElement>('.duck-img')!;
   const bubble = root.querySelector<HTMLElement>('.bubble')!;
@@ -73,6 +76,11 @@ export function mountScene(root: HTMLElement): void {
   door.style.width = `${EXTERIOR_DOOR.width}%`;
   door.style.height = `${EXTERIOR_DOOR.height}%`;
   door.addEventListener('click', () => show('interior'));
+  doorIn.style.left = `${INTERIOR_DOOR.left}%`;
+  doorIn.style.top = `${INTERIOR_DOOR.top}%`;
+  doorIn.style.width = `${INTERIOR_DOOR.width}%`;
+  doorIn.style.height = `${INTERIOR_DOOR.height}%`;
+  doorIn.addEventListener('click', () => show('exterior'));
 
   function show(id: SceneId): void {
     const scene = SCENES[id];
@@ -95,6 +103,7 @@ export function mountScene(root: HTMLElement): void {
     caption.textContent = scene.caption;
     duck.style.display = id === 'interior' ? '' : 'none';
     door.style.display = id === 'exterior' ? '' : 'none';
+    doorIn.style.display = id === 'interior' ? '' : 'none';
     for (const btn of spotButtons) btn.style.display = id === 'interior' ? '' : 'none';
     for (const btn of buttons) {
       btn.setAttribute('aria-pressed', String(btn.dataset.scene === id));
