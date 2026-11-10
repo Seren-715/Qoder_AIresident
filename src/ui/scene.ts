@@ -9,7 +9,6 @@ import {
   type SceneId,
 } from '../data/scene';
 import { WATER, clipPath } from '../data/water';
-import { WIND, windMask, windOrigin } from '../data/wind';
 
 export function mountScene(root: HTMLElement): void {
   root.innerHTML = `
@@ -19,7 +18,6 @@ export function mountScene(root: HTMLElement): void {
     </header>
     <div class="scene" role="group" aria-label="小黄鸭的树洞小屋">
       <img class="scene-bg" alt="" />
-      <div class="wind-layer"></div>
       <div class="water-layer"></div>
       <div class="duck">
         <div class="bubble"></div>
@@ -39,7 +37,6 @@ export function mountScene(root: HTMLElement): void {
 
   const sceneEl = root.querySelector<HTMLElement>('.scene')!;
   const bg = root.querySelector<HTMLImageElement>('.scene-bg')!;
-  const windLayer = root.querySelector<HTMLElement>('.wind-layer')!;
   const waterLayer = root.querySelector<HTMLElement>('.water-layer')!;
   const door = root.querySelector<HTMLButtonElement>('.hotspot-door')!;
   const duck = root.querySelector<HTMLElement>('.duck')!;
@@ -80,13 +77,6 @@ export function mountScene(root: HTMLElement): void {
   function show(id: SceneId): void {
     const scene = SCENES[id];
     bg.src = assetUrl(scene.image);
-    windLayer.innerHTML = WIND[id]
-      .map((r) => {
-        const { ox, oy } = windOrigin(r);
-        const mask = windMask(r);
-        return `<div class="wind wind-${r.kind}" style="background-image:url('${assetUrl(scene.image)}');-webkit-mask-image:${mask};mask-image:${mask};--ox:${ox}%;--oy:${oy}%;--dur:${r.dur}s;--delay:${r.delay}s;--amp:${r.amp ?? 1}"></div>`;
-      })
-      .join('');
     waterLayer.innerHTML = WATER[id]
       .map(
         (region) => `
