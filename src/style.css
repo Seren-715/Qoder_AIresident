@@ -169,6 +169,8 @@ h1 {
   position: absolute;
   width: 12%;
   transform: translate(-50%, -100%);
+  z-index: 3;
+  cursor: pointer;
 }
 
 .duck-img {
@@ -231,4 +233,115 @@ h1 {
   text-align: center;
   font-size: 12px;
   color: #b3a184;
+}
+
+.chat {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(40, 25, 10, 0.35);
+}
+
+.chat[hidden] {
+  display: none;
+}
+
+.chat-sheet {
+  width: min(100%, 480px);
+  max-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+}
+
+.chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+}
+
+.chat-close {
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.chat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding: 12px;
+  min-height: 140px;
+}
+
+.msg {
+  max-width: 82%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.msg-user {
+  align-self: flex-end;
+  background: #ffd766;
+}
+
+.msg-duck {
+  align-self: flex-start;
+  background: #fff3d6;
+  border: 1px solid var(--line);
+}
+
+.chat-loading {
+  padding: 0 14px 8px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.chat-form {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.chat-form input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.chat-form button {
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid #e8b93f;
+  background: #ffd766;
+  color: var(--ink);
+  cursor: pointer;
 }

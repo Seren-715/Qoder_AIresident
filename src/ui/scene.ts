@@ -10,6 +10,7 @@ import {
   type SceneId,
 } from '../data/scene';
 import { WATER, clipPath } from '../data/water';
+import { mountChat } from './chat';
 
 export function mountScene(root: HTMLElement): void {
   root.innerHTML = `
@@ -20,7 +21,7 @@ export function mountScene(root: HTMLElement): void {
     <div class="scene" role="group" aria-label="小黄鸭的树洞小屋">
       <img class="scene-bg" alt="" />
       <div class="water-layer"></div>
-      <div class="duck">
+      <div class="duck" role="button" tabindex="0" aria-label="和小黄鸭聊天">
         <div class="bubble"></div>
         <img class="duck-img" alt="小黄鸭" />
       </div>
@@ -114,5 +115,13 @@ export function mountScene(root: HTMLElement): void {
     btn.addEventListener('click', () => show(btn.dataset.scene as SceneId));
   }
   setDuck(FURNITURE[IDLE_SPOT.furniture].anchor, IDLE_SPOT.pose, IDLE_SPOT.bubble);
+  const chat = mountChat();
+  duck.addEventListener('click', () => chat.open());
+  duck.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      chat.open();
+    }
+  });
   show('interior');
 }
