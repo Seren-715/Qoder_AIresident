@@ -57,12 +57,12 @@ export const FURNITURE: Record<
   desk: {
     name: '书桌',
     anchor: { x: 48, y: 60 },
-    action: { pose: 'sit', bubble: '在写代码', area: { left: 36, top: 42, width: 22, height: 24 } },
+    action: { pose: 'back', bubble: '在电脑前写代码', area: { left: 36, top: 42, width: 22, height: 24 } },
   },
   window: {
     name: '窗户',
     anchor: { x: 29.5, y: 34 },
-    action: { pose: 'back', bubble: '在窗边发呆', area: { left: 24, top: 10, width: 10, height: 19 } },
+    action: { pose: 'sit', bubble: '在窗边发呆', area: { left: 24, top: 10, width: 10, height: 19 } },
   },
   rug: {
     name: '地毯',
