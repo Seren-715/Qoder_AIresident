@@ -8,6 +8,7 @@ import {
   type DuckPose,
   type SceneId,
 } from '../data/scene';
+import { WATER, clipPath } from '../data/water';
 
 export function mountScene(root: HTMLElement): void {
   root.innerHTML = `
@@ -17,6 +18,7 @@ export function mountScene(root: HTMLElement): void {
     </header>
     <div class="scene" role="group" aria-label="小黄鸭的树洞小屋">
       <img class="scene-bg" alt="" />
+      <div class="water-layer"></div>
       <div class="duck">
         <div class="bubble"></div>
         <img class="duck-img" alt="小黄鸭" />
@@ -35,6 +37,7 @@ export function mountScene(root: HTMLElement): void {
 
   const sceneEl = root.querySelector<HTMLElement>('.scene')!;
   const bg = root.querySelector<HTMLImageElement>('.scene-bg')!;
+  const waterLayer = root.querySelector<HTMLElement>('.water-layer')!;
   const door = root.querySelector<HTMLButtonElement>('.hotspot-door')!;
   const duck = root.querySelector<HTMLElement>('.duck')!;
   const duckImg = root.querySelector<HTMLImageElement>('.duck-img')!;
@@ -74,6 +77,21 @@ export function mountScene(root: HTMLElement): void {
   function show(id: SceneId): void {
     const scene = SCENES[id];
     bg.src = assetUrl(scene.image);
+    waterLayer.innerHTML = WATER[id]
+      .map(
+        (region) => `
+        <div class="water" style="clip-path: ${clipPath(region)}">
+          <div class="water-flow"></div>
+          <div class="water-flow water-flow-b"></div>
+          ${region.ripples
+            .map(
+              (r) =>
+                `<span class="ripple" style="left:${r.x}%;top:${r.y}%;width:${r.width}%;animation-delay:${r.delay}s"></span>`,
+            )
+            .join('')}
+        </div>`,
+      )
+      .join('');
     caption.textContent = scene.caption;
     duck.style.display = id === 'interior' ? '' : 'none';
     door.style.display = id === 'exterior' ? '' : 'none';
