@@ -14,6 +14,9 @@
 - ✅ 角色姿态表：8 个姿态（`source/pose-sheet.webp`），已抠图切好，放在 `public/assets/duck/`
 - 效果预览：[`preview-room.png`](preview-room.png)（6 个姿态同时贴进屋内，仅作检查，游戏里同一时间只出现一只）
 
+- ✅ 物件分层（11-12）：屋内 9 件、屋外 14 件已切成独立贴图，见 [`物件分层-晃动.md`](物件分层-晃动.md) 和 `props.json`
+- 分工：**场景美术由 Claude 和 GPT 负责，Qoder 不改图、不生图**
+
 ## 文件
 
 | 文件 | 内容 |
