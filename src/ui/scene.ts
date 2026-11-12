@@ -12,6 +12,7 @@ import {
 import { WATER, clipPath } from '../data/water';
 import { mountChat } from './chat';
 import { mountSettings } from './settings';
+import { renderProps, sceneBackground } from './props';
 
 export function mountScene(root: HTMLElement): void {
   root.innerHTML = `
@@ -22,10 +23,12 @@ export function mountScene(root: HTMLElement): void {
     <div class="scene" role="group" aria-label="小黄鸭的树洞小屋">
       <img class="scene-bg" alt="" />
       <div class="water-layer"></div>
+      <div class="props props-back"></div>
       <div class="duck" role="button" tabindex="0" aria-label="和小黄鸭聊天">
         <div class="bubble"></div>
         <img class="duck-img" alt="小黄鸭" />
       </div>
+      <div class="props props-front"></div>
       <button type="button" class="hotspot hotspot-door" aria-label="进入小屋"></button>
       <button type="button" class="hotspot hotspot-door-in" aria-label="走出小屋"></button>
     </div>
@@ -42,6 +45,8 @@ export function mountScene(root: HTMLElement): void {
   const sceneEl = root.querySelector<HTMLElement>('.scene')!;
   const bg = root.querySelector<HTMLImageElement>('.scene-bg')!;
   const waterLayer = root.querySelector<HTMLElement>('.water-layer')!;
+  const propsBack = root.querySelector<HTMLElement>('.props-back')!;
+  const propsFront = root.querySelector<HTMLElement>('.props-front')!;
   const door = root.querySelector<HTMLButtonElement>('.hotspot-door')!;
   const doorIn = root.querySelector<HTMLButtonElement>('.hotspot-door-in')!;
   const duck = root.querySelector<HTMLElement>('.duck')!;
@@ -49,6 +54,8 @@ export function mountScene(root: HTMLElement): void {
   const bubble = root.querySelector<HTMLElement>('.bubble')!;
   const caption = root.querySelector<HTMLElement>('.caption')!;
   const buttons = root.querySelectorAll<HTMLButtonElement>('[data-scene]');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let currentScene: SceneId = 'interior';
 
   function setDuck(anchor: { x: number; y: number }, pose: DuckPose, text: string): void {
     duck.style.left = `${anchor.x}%`;
@@ -85,8 +92,10 @@ export function mountScene(root: HTMLElement): void {
   doorIn.addEventListener('click', () => show('exterior'));
 
   function show(id: SceneId): void {
+    currentScene = id;
     const scene = SCENES[id];
-    bg.src = assetUrl(scene.image);
+    bg.src = assetUrl(sceneBackground(id));
+    renderProps(propsBack, propsFront, id, reducedMotion.matches);
     waterLayer.innerHTML = WATER[id]
       .map(
         (region) => `
@@ -115,6 +124,9 @@ export function mountScene(root: HTMLElement): void {
   for (const btn of buttons) {
     btn.addEventListener('click', () => show(btn.dataset.scene as SceneId));
   }
+  reducedMotion.addEventListener('change', () => {
+    renderProps(propsBack, propsFront, currentScene, reducedMotion.matches);
+  });
   setDuck(FURNITURE[IDLE_SPOT.furniture].anchor, IDLE_SPOT.pose, IDLE_SPOT.bubble);
   const chat = mountChat();
   mountSettings(sceneEl);

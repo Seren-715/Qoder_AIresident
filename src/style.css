@@ -61,6 +61,70 @@ h1 {
   display: block;
 }
 
+.props {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.props-back {
+  z-index: 2;
+}
+
+.props-front {
+  z-index: 4;
+}
+
+.prop {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.prop-hover {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.prop-auto-swing {
+  animation: prop-swing var(--dur, 3s) ease-in-out var(--delay, 0s) infinite alternate;
+}
+
+.prop-auto-skew {
+  animation: prop-skew var(--dur, 3s) ease-in-out var(--delay, 0s) infinite alternate;
+}
+
+.prop-auto-drift {
+  animation: prop-drift var(--dur, 60s) ease-in-out var(--delay, 0s) infinite alternate;
+}
+
+@keyframes prop-swing {
+  from {
+    transform: rotate(calc(var(--amp, 2) * -1deg));
+  }
+  to {
+    transform: rotate(calc(var(--amp, 2) * 1deg));
+  }
+}
+
+@keyframes prop-skew {
+  from {
+    transform: skewX(calc(var(--amp, 2) * -1deg));
+  }
+  to {
+    transform: skewX(calc(var(--amp, 2) * 1deg));
+  }
+}
+
+@keyframes prop-drift {
+  from {
+    margin-left: calc(var(--min, 0) * 1%);
+  }
+  to {
+    margin-left: calc(var(--max, 0) * 1%);
+  }
+}
+
 .water-layer {
   position: absolute;
   inset: 0;
@@ -140,6 +204,10 @@ h1 {
   .ripple {
     animation: none;
     opacity: 0;
+  }
+
+  .prop {
+    animation: none;
   }
 }
 
