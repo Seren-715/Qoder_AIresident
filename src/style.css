@@ -1,0 +1,479 @@
+:root {
+  color-scheme: light;
+  --ink: #4a3b28;
+  --ink-soft: #8a7350;
+  --paper: #fff8e7;
+  --card: #fffdf7;
+  --line: #f0d9a8;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #fff8e7 0%, #ffe9c7 100%);
+  color: var(--ink);
+  font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  padding: 16px 12px 24px;
+}
+
+#app {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.top {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+h1 {
+  font-size: 22px;
+}
+
+.tagline {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+.scene {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #d9c193;
+  box-shadow: 0 10px 30px rgba(160, 120, 40, 0.15);
+}
+
+.scene-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.water-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.water {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.water-flow {
+  position: absolute;
+  inset: -30%;
+  background: repeating-linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0) 0 10px,
+    rgba(255, 255, 255, 0.14) 10px 13px,
+    rgba(255, 255, 255, 0) 13px 24px
+  );
+  mix-blend-mode: soft-light;
+  animation: water-flow 7s ease-in-out infinite;
+}
+
+.water-flow-b {
+  background: repeating-linear-gradient(
+    99deg,
+    rgba(255, 255, 255, 0) 0 14px,
+    rgba(220, 240, 255, 0.1) 14px 17px,
+    rgba(255, 255, 255, 0) 17px 30px
+  );
+  animation: water-flow 11s ease-in-out infinite reverse;
+}
+
+@keyframes water-flow {
+  0% {
+    transform: translateX(-12px);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(12px);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(-12px);
+    opacity: 0.55;
+  }
+}
+
+.ripple {
+  position: absolute;
+  aspect-ratio: 2.6 / 1;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0.15);
+  opacity: 0;
+  animation: ripple 4.5s ease-out infinite;
+}
+
+@keyframes ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.15);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .water-flow,
+  .ripple {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+.hotspot {
+  position: absolute;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: box-shadow 0.2s, background-color 0.2s;
+}
+
+.hotspot-door,
+.hotspot-door-in {
+  border-radius: 50% 50% 6% 6% / 62% 62% 6% 6%;
+}
+
+.hotspot:hover,
+.hotspot:focus-visible {
+  background: rgba(255, 220, 120, 0.22);
+  box-shadow: 0 0 0 3px rgba(255, 215, 102, 0.85), 0 0 18px rgba(255, 200, 80, 0.6);
+  outline: none;
+}
+
+.duck {
+  position: absolute;
+  width: 12%;
+  transform: translate(-50%, -100%);
+  z-index: 3;
+  cursor: pointer;
+}
+
+.duck-img {
+  width: 100%;
+  display: block;
+  filter: drop-shadow(0 3px 3px rgba(80, 50, 20, 0.25));
+}
+
+.bubble {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.controls {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.switch {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.switch button {
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 22px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.switch button[aria-pressed="true"] {
+  background: #ffd766;
+  border-color: #e8b93f;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.caption {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.foot {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 12px;
+  color: #b3a184;
+}
+
+.gear {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 4;
+  font: inherit;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 253, 247, 0.9);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.settings {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(40, 25, 10, 0.35);
+  padding: 16px;
+}
+
+.settings[hidden] {
+  display: none;
+}
+
+.settings-card {
+  width: min(100%, 360px);
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.settings-close {
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.settings-item {
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #fff3d6;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.settings-form input,
+.settings-form select {
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  width: 100%;
+}
+
+.settings-note {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.settings-error {
+  font-size: 12px;
+  color: #b3543f;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.settings-actions button {
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.settings-actions button[type="submit"] {
+  background: #ffd766;
+  border-color: #e8b93f;
+  color: var(--ink);
+}
+
+.chat {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(40, 25, 10, 0.35);
+}
+
+.chat[hidden] {
+  display: none;
+}
+
+.chat-sheet {
+  width: min(100%, 480px);
+  max-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+}
+
+.chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+}
+
+.chat-close {
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.chat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding: 12px;
+  min-height: 140px;
+}
+
+.msg {
+  max-width: 82%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.msg-user {
+  align-self: flex-end;
+  background: #ffd766;
+}
+
+.msg-duck {
+  align-self: flex-start;
+  background: #fff3d6;
+  border: 1px solid var(--line);
+}
+
+.chat-loading {
+  padding: 0 14px 8px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.chat-form {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.chat-form input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.chat-form button {
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid #e8b93f;
+  background: #ffd766;
+  color: var(--ink);
+  cursor: pointer;
+}

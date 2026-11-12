@@ -5,7 +5,7 @@
 Qoder 小黄鸭在自己的小屋里过日子：睡觉、吃饭、看书、发呆，偶尔背包出门旅行，寄回明信片和纪念品。你随时打开网页看看它在干嘛，喂它、摸它、跟它聊天。
 
 - 赛事：天池大赛 · LifeHack 赛道（全程使用 Qoder 开发）
-- 在线体验：_待部署到 Qoder Sites 后填写_
+- 在线体验：https://ai-resident-f995e98g60k.qoder.zone （当前为部署验证页，功能开发中）
 - 计划与需求：[docs/00-计划与需求草案.md](docs/00-计划与需求草案.md)
 - Qoder 使用日志：[docs/qoder-log.md](docs/qoder-log.md)
 
