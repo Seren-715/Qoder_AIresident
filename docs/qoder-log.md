@@ -26,6 +26,7 @@
 | 11-13 | 云改为 travelFrom / travelTo 单向匀速漂移，加入天空遮罩，直接动画场景百分比 left | Agent | 构建与 41 个测试通过；0/10 秒对照位移明显，三组关键帧、负延迟、遮罩、减少动态效果与 375px 验收通过 |  |  |
 | 11-13 | 自主阅读 R0：核对现状，设计模块、双游标存档、任务状态机、预算与 R0-R3 Spec | Agent | 三轮设计审查后无阻塞问题；只新增设计文档，业务代码未改；构建与 41 个测试通过 |  |  |
 | 11-13 | 水面第二版：canvas 按 2px 横条错位重绘背景水域 + destination-in 水域遮罩 + 短反光 + 荷叶 bob + 扁椭圆涟漪；移除旧条纹与椭圆圈 | Agent | 构建与 51 个测试通过；内景水池与门外池塘反光/偏移、外景 6 片荷叶 bob 与涟漪、375px 无溢出、点击穿透验收通过 |  | `1113-water-interior-t0.png` `1113-water-interior-t1.png` `1113-water-exterior-t0.png` `1113-water-exterior-t1.png` `1113-water-exterior-t4.png` `1113-water-mobile-375.png` |
+| 11-13 | 发布水面第二版 + 荷叶涟漪 + 云漂移 + 物件分层到 Qoder Sites（保持私有） | Agent | 上传服务连续失败后恢复；改为只声明必需 Secret LLM_API_KEY 后准备就绪并发布成功；线上地址 ai-resident-f995e98g60k.qoder.zone |  |  |
 
 ## 值得写进帖子的瞬间
 
