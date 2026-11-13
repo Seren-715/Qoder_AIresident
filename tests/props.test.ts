@@ -49,8 +49,8 @@ describe('物件分层数据', () => {
     }
   });
 
-  it('外景十四件使用独立周期，前景仅四丛植物', () => {
-    expect(PROPS.exterior.props).toHaveLength(14);
+  it('外景二十件使用独立周期，前景仅四丛植物', () => {
+    expect(PROPS.exterior.props).toHaveLength(20);
     expect(PROPS.exterior.props.filter((prop) => prop.layer === 'front').map((prop) => prop.id))
       .toEqual(['plants-left', 'daisies', 'flowers-yellow', 'reeds-pond']);
     for (const prop of PROPS.exterior.props) {
@@ -58,6 +58,19 @@ describe('物件分层数据', () => {
       expect(prop.period).toBeGreaterThan(0);
       expect(typeof prop.delay).toBe('number');
     }
+  });
+
+  it('六片荷叶 bob：后层、正 bobY、周期与延迟各不相同、允许涟漪', () => {
+    const lilies = PROPS.exterior.props.filter((prop) => prop.motion === 'bob');
+    expect(lilies).toHaveLength(6);
+    for (const lily of lilies) {
+      expect(lily.layer).toBe('back');
+      expect(lily.ripples).toBe(true);
+      expect(lily.bobY).toBe(0.14);
+      expect(lily.amplitude).toBe(0.9);
+    }
+    expect(new Set(lilies.map((l) => l.period)).size).toBe(6);
+    expect(new Set(lilies.map((l) => l.delay)).size).toBe(6);
   });
 
   it('摆动与斜切有正幅度，云的左右边缘范围有效', () => {

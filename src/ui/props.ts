@@ -24,6 +24,9 @@ function buildProp(spec: PropSpec, reduced: boolean): HTMLImageElement {
     if (spec.motion === 'drift') {
       img.style.setProperty('--from', `${spec.travelFrom!}%`);
       img.style.setProperty('--to', `${spec.travelTo!}%`);
+    } else if (spec.motion === 'bob') {
+      img.style.setProperty('--bob', `${((spec.bobY ?? 0) / spec.height) * 100}%`);
+      img.style.setProperty('--amp', String(spec.amplitude ?? 0));
     } else {
       img.style.setProperty('--amp', String(spec.amplitude ?? 0));
     }

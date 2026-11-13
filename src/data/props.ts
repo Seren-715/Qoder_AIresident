@@ -1,6 +1,6 @@
 import type { SceneId } from './scene';
 
-export type PropMotion = 'swing' | 'skew' | 'drift';
+export type PropMotion = 'swing' | 'skew' | 'drift' | 'bob';
 export type PropTrigger = 'hover' | 'auto';
 export type PropLayer = 'back' | 'front';
 
@@ -21,6 +21,8 @@ export interface PropSpec {
   travelFrom?: number;
   travelTo?: number;
   delay?: number;
+  bobY?: number;
+  ripples?: boolean;
 }
 
 export interface SceneProps {
@@ -60,6 +62,12 @@ export const PROPS: Record<SceneId, SceneProps> = {
       { id: 'path-flowers-yellow', image: 'art/props/exterior/path-flowers-yellow.png', left: 84.99, top: 60.36, width: 3.77, height: 4.46, originX: 49.2, originY: 90.5, motion: 'skew', trigger: 'auto', period: 2.6, layer: 'back', amplitude: 2.5, delay: -0.9 },
       { id: 'reeds-right', image: 'art/props/exterior/reeds-right.png', left: 88.04, top: 54.94, width: 11.96, height: 21.57, originX: 51.5, originY: 90.1, motion: 'skew', trigger: 'auto', period: 3.9, layer: 'back', amplitude: 1.8, delay: -1.3 },
       { id: 'reeds-pond', image: 'art/props/exterior/reeds-pond.png', left: 89.17, top: 81.83, width: 10.83, height: 16.26, originX: 60.2, originY: 94.8, motion: 'skew', trigger: 'auto', period: 3.5, layer: 'front', amplitude: 2.0, delay: -2.2 },
+      { id: 'lily-1', image: 'art/props/exterior/lily-1.png', left: 74.76, top: 74.18, width: 5.92, height: 3.51, originX: 50, originY: 50, motion: 'bob', trigger: 'auto', period: 3.6, delay: 0, layer: 'back', bobY: 0.14, amplitude: 0.9, ripples: true },
+      { id: 'lily-2', image: 'art/props/exterior/lily-2.png', left: 78.11, top: 77.47, width: 5.2, height: 4.04, originX: 50, originY: 50, motion: 'bob', trigger: 'auto', period: 4.3, delay: -1.2, layer: 'back', bobY: 0.14, amplitude: 0.9, ripples: true },
+      { id: 'lily-3', image: 'art/props/exterior/lily-3.png', left: 82.54, top: 80.13, width: 4.55, height: 3.51, originX: 50, originY: 50, motion: 'bob', trigger: 'auto', period: 3.9, delay: -2.5, layer: 'back', bobY: 0.14, amplitude: 0.9, ripples: true },
+      { id: 'lily-4', image: 'art/props/exterior/lily-4.png', left: 45.33, top: 81.08, width: 4.25, height: 3.08, originX: 50, originY: 50, motion: 'bob', trigger: 'auto', period: 4.6, delay: -0.6, layer: 'back', bobY: 0.14, amplitude: 0.9, ripples: true },
+      { id: 'lily-5', image: 'art/props/exterior/lily-5.png', left: 40.61, top: 81.51, width: 7.89, height: 6.38, originX: 50, originY: 50, motion: 'bob', trigger: 'auto', period: 4.1, delay: -3.1, layer: 'back', bobY: 0.14, amplitude: 0.9, ripples: true },
+      { id: 'lily-6', image: 'art/props/exterior/lily-6.png', left: 49.34, top: 86.4, width: 3.83, height: 2.87, originX: 50, originY: 50, motion: 'bob', trigger: 'auto', period: 3.4, delay: -1.9, layer: 'back', bobY: 0.14, amplitude: 0.9, ripples: true },
     ],
   },
 };

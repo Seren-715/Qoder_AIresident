@@ -68,11 +68,11 @@ h1 {
 }
 
 .props-back {
-  z-index: 2;
+  z-index: 3;
 }
 
 .props-front {
-  z-index: 4;
+  z-index: 5;
 }
 
 .props-clouds {
@@ -108,6 +108,10 @@ h1 {
   animation: prop-drift var(--dur, 60s) linear var(--delay, 0s) infinite;
 }
 
+.prop-auto-bob {
+  animation: prop-bob var(--dur, 4s) ease-in-out var(--delay, 0s) infinite alternate;
+}
+
 @keyframes prop-swing {
   from {
     transform: rotate(calc(var(--amp, 2) * -1deg));
@@ -135,87 +139,26 @@ h1 {
   }
 }
 
-.water-layer {
+@keyframes prop-bob {
+  from {
+    transform: translateY(calc(var(--bob, 0%) * -1)) rotate(calc(var(--amp, 1) * -1deg));
+  }
+  to {
+    transform: translateY(var(--bob, 0%)) rotate(calc(var(--amp, 1) * 1deg));
+  }
+}
+
+.water-canvas {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
   pointer-events: none;
-}
-
-.water {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-
-.water-flow {
-  position: absolute;
-  inset: -30%;
-  background: repeating-linear-gradient(
-    105deg,
-    rgba(255, 255, 255, 0) 0 10px,
-    rgba(255, 255, 255, 0.14) 10px 13px,
-    rgba(255, 255, 255, 0) 13px 24px
-  );
-  mix-blend-mode: soft-light;
-  animation: water-flow 7s ease-in-out infinite;
-}
-
-.water-flow-b {
-  background: repeating-linear-gradient(
-    99deg,
-    rgba(255, 255, 255, 0) 0 14px,
-    rgba(220, 240, 255, 0.1) 14px 17px,
-    rgba(255, 255, 255, 0) 17px 30px
-  );
-  animation: water-flow 11s ease-in-out infinite reverse;
-}
-
-@keyframes water-flow {
-  0% {
-    transform: translateX(-12px);
-    opacity: 0.55;
-  }
-  50% {
-    transform: translateX(12px);
-    opacity: 0.9;
-  }
-  100% {
-    transform: translateX(-12px);
-    opacity: 0.55;
-  }
-}
-
-.ripple {
-  position: absolute;
-  aspect-ratio: 2.6 / 1;
-  border: 2px solid rgba(255, 255, 255, 0.55);
-  border-radius: 50%;
-  transform: translate(-50%, -50%) scale(0.15);
-  opacity: 0;
-  animation: ripple 4.5s ease-out infinite;
-}
-
-@keyframes ripple {
-  0% {
-    transform: translate(-50%, -50%) scale(0.15);
-    opacity: 0;
-  }
-  12% {
-    opacity: 0.55;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0;
-  }
+  z-index: 2;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .water-flow,
-  .ripple {
-    animation: none;
-    opacity: 0;
-  }
-
   .prop {
     animation: none;
   }
@@ -229,6 +172,7 @@ h1 {
   cursor: pointer;
   border-radius: 12px;
   transition: box-shadow 0.2s, background-color 0.2s;
+  z-index: 6;
 }
 
 .hotspot-door,
@@ -247,7 +191,7 @@ h1 {
   position: absolute;
   width: 10%;
   transform: translate(-50%, -100%);
-  z-index: 3;
+  z-index: 4;
   cursor: pointer;
 }
 
@@ -317,7 +261,7 @@ h1 {
   position: absolute;
   top: 8px;
   right: 8px;
-  z-index: 4;
+  z-index: 7;
   font: inherit;
   font-size: 12px;
   padding: 6px 12px;
