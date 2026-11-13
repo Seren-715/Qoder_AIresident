@@ -137,7 +137,44 @@
         "layer": "back",
         "amplitude": 7
       }
-    ]
+    ],
+    "water": {
+      "mask": "art/props/interior/water-mask.png",
+      "regions": [
+        {
+          "left": 0.0,
+          "top": 76.33,
+          "width": 21.19,
+          "height": 21.33
+        },
+        {
+          "left": 86.56,
+          "top": 52.0,
+          "width": 11.88,
+          "height": 23.22
+        }
+      ],
+      "ampTop": 0.5,
+      "ampBottom": 1.4,
+      "glints": 9,
+      "glintLengthBottom": 20,
+      "strip": 2,
+      "wave1": {
+        "wavelength": 46,
+        "period": 3.8
+      },
+      "wave2": {
+        "wavelength": 17,
+        "period": 2.3,
+        "weight": 0.45
+      },
+      "glintLife": 3.2,
+      "glintAlpha": 0.5,
+      "glintColor": "#f4fbf6",
+      "glintLengthTop": 9,
+      "glintThicknessTop": 1.2,
+      "glintThicknessBottom": 2.4
+    }
   },
   "exterior": {
     "background": "art/room-exterior-clean.webp",
@@ -362,8 +399,155 @@
         "layer": "front",
         "amplitude": 2.0,
         "delay": -2.2
+      },
+      {
+        "id": "lily-1",
+        "image": "art/props/exterior/lily-1.png",
+        "left": 74.76,
+        "top": 74.18,
+        "width": 5.92,
+        "height": 3.51,
+        "originX": 50,
+        "originY": 50,
+        "motion": "bob",
+        "trigger": "auto",
+        "bobY": 0.14,
+        "amplitude": 0.9,
+        "period": 3.6,
+        "delay": 0,
+        "layer": "back",
+        "ripples": true
+      },
+      {
+        "id": "lily-2",
+        "image": "art/props/exterior/lily-2.png",
+        "left": 78.11,
+        "top": 77.47,
+        "width": 5.2,
+        "height": 4.04,
+        "originX": 50,
+        "originY": 50,
+        "motion": "bob",
+        "trigger": "auto",
+        "bobY": 0.14,
+        "amplitude": 0.9,
+        "period": 4.3,
+        "delay": -1.2,
+        "layer": "back",
+        "ripples": true
+      },
+      {
+        "id": "lily-3",
+        "image": "art/props/exterior/lily-3.png",
+        "left": 82.54,
+        "top": 80.13,
+        "width": 4.55,
+        "height": 3.51,
+        "originX": 50,
+        "originY": 50,
+        "motion": "bob",
+        "trigger": "auto",
+        "bobY": 0.14,
+        "amplitude": 0.9,
+        "period": 3.9,
+        "delay": -2.5,
+        "layer": "back",
+        "ripples": true
+      },
+      {
+        "id": "lily-4",
+        "image": "art/props/exterior/lily-4.png",
+        "left": 45.33,
+        "top": 81.08,
+        "width": 4.25,
+        "height": 3.08,
+        "originX": 50,
+        "originY": 50,
+        "motion": "bob",
+        "trigger": "auto",
+        "bobY": 0.14,
+        "amplitude": 0.9,
+        "period": 4.6,
+        "delay": -0.6,
+        "layer": "back",
+        "ripples": true
+      },
+      {
+        "id": "lily-5",
+        "image": "art/props/exterior/lily-5.png",
+        "left": 40.61,
+        "top": 81.51,
+        "width": 7.89,
+        "height": 6.38,
+        "originX": 50,
+        "originY": 50,
+        "motion": "bob",
+        "trigger": "auto",
+        "bobY": 0.14,
+        "amplitude": 0.9,
+        "period": 4.1,
+        "delay": -3.1,
+        "layer": "back",
+        "ripples": true
+      },
+      {
+        "id": "lily-6",
+        "image": "art/props/exterior/lily-6.png",
+        "left": 49.34,
+        "top": 86.4,
+        "width": 3.83,
+        "height": 2.87,
+        "originX": 50,
+        "originY": 50,
+        "motion": "bob",
+        "trigger": "auto",
+        "bobY": 0.14,
+        "amplitude": 0.9,
+        "period": 3.4,
+        "delay": -1.9,
+        "layer": "back",
+        "ripples": true
       }
     ],
-    "cloudMask": "art/props/exterior/sky-mask.png"
+    "cloudMask": "art/props/exterior/sky-mask.png",
+    "water": {
+      "mask": "art/props/exterior/water-mask.png",
+      "regions": [
+        {
+          "left": 32.75,
+          "top": 71.56,
+          "width": 67.25,
+          "height": 28.44
+        }
+      ],
+      "ampTop": 0.5,
+      "ampBottom": 2.2,
+      "glints": 26,
+      "glintLengthBottom": 30,
+      "rings": {
+        "every": 7,
+        "life": 3.2,
+        "alpha": 0.35,
+        "grow": 26,
+        "flatten": 0.3,
+        "lineWidth": 1.6
+      },
+      "strip": 2,
+      "wave1": {
+        "wavelength": 46,
+        "period": 3.8
+      },
+      "wave2": {
+        "wavelength": 17,
+        "period": 2.3,
+        "weight": 0.45
+      },
+      "glintLife": 3.2,
+      "glintAlpha": 0.5,
+      "glintColor": "#f4fbf6",
+      "glintLengthTop": 9,
+      "glintThicknessTop": 1.2,
+      "glintThicknessBottom": 2.4
+    }
   }
 }
