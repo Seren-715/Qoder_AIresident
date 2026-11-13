@@ -25,6 +25,13 @@ describe('场景数据', () => {
     }
   });
 
+  it('书架动作落位在书架旁的地面，不在层架上', () => {
+    const { anchor } = FURNITURE.bookshelf;
+    expect(anchor.x).toBeGreaterThan(17);
+    expect(anchor.x).toBeLessThan(28);
+    expect(anchor.y).toBeGreaterThan(72);
+  });
+
   it('开局 idle 位置指向存在的家具', () => {
     expect(FURNITURE[IDLE_SPOT.furniture]).toBeDefined();
   });

@@ -51,8 +51,8 @@ export const FURNITURE: Record<
   },
   bookshelf: {
     name: '书架',
-    anchor: { x: 11, y: 70 },
-    action: { pose: 'read', bubble: '在看书', area: { left: 3, top: 40, width: 14, height: 27 } },
+    anchor: { x: 24, y: 77 },
+    action: { pose: 'read', bubble: '在看书', area: { left: 3, top: 40, width: 23, height: 33 } },
   },
   desk: {
     name: '书桌',
