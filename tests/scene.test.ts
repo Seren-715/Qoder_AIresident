@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { EXTERIOR_DOOR, FURNITURE, IDLE_SPOT, INTERIOR_DOOR, SCENES, type FurnitureId } from '../src/data/scene';
+import { PROPS } from '../src/data/props';
 
 const SPEC_IDS: FurnitureId[] = ['bed', 'bowl', 'bookshelf', 'desk', 'window', 'rug', 'door'];
 
@@ -17,11 +18,18 @@ describe('场景数据', () => {
     }
   });
 
-  it('两个场景都有图和说明', () => {
-    for (const scene of Object.values(SCENES)) {
-      expect(scene.image).toMatch(/^art\/room-(interior|exterior)\.webp$/);
+  it('两个场景都有底图和说明', () => {
+    for (const [id, scene] of Object.entries(SCENES)) {
+      expect(PROPS[id as keyof typeof PROPS].background).toMatch(/^art\/room-(interior|exterior)-clean\.webp$/);
       expect(scene.caption.length).toBeGreaterThan(0);
     }
+  });
+
+  it('书架动作落位在书架旁的地面，不在层架上', () => {
+    const { anchor } = FURNITURE.bookshelf;
+    expect(anchor.x).toBeGreaterThan(17);
+    expect(anchor.x).toBeLessThan(28);
+    expect(anchor.y).toBeGreaterThan(72);
   });
 
   it('开局 idle 位置指向存在的家具', () => {

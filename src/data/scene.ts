@@ -51,8 +51,8 @@ export const FURNITURE: Record<
   },
   bookshelf: {
     name: '书架',
-    anchor: { x: 11, y: 70 },
-    action: { pose: 'read', bubble: '在看书', area: { left: 3, top: 40, width: 14, height: 27 } },
+    anchor: { x: 24, y: 77 },
+    action: { pose: 'read', bubble: '在看书', area: { left: 3, top: 40, width: 23, height: 33 } },
   },
   desk: {
     name: '书桌',
@@ -74,15 +74,13 @@ export const FURNITURE: Record<
 
 export type SceneId = 'interior' | 'exterior';
 
-export const SCENES: Record<SceneId, { label: string; image: string; caption: string }> = {
+export const SCENES: Record<SceneId, { label: string; caption: string }> = {
   interior: {
     label: '屋内',
-    image: 'art/room-interior.webp',
     caption: '树洞小屋：点床、书架、书桌、窗户、饭碗或地毯，小黄鸭会过去做对应的事；点右边拱门到屋外。',
   },
   exterior: {
     label: '屋外',
-    image: 'art/room-exterior.webp',
     caption: '小屋外面：菜地、池塘和一条通往远方的小路。点一下树洞门，进屋看看。',
   },
 };

@@ -1,58 +1,125 @@
 import type { SceneId } from './scene';
 
-export interface Ripple {
-  x: number;
-  y: number;
-  delay: number;
-  width: number;
-}
-
+/** 水域矩形（% 相对场景宽高）。 */
 export interface WaterRegion {
-  polygon: [number, number][];
-  ripples: Ripple[];
+  left: number;
+  top: number;
+  width: number;
+  height: number;
 }
 
-export const WATER: Record<SceneId, WaterRegion[]> = {
-  interior: [
-    {
-      polygon: [
-        [0, 76], [6, 77], [11, 80], [16, 85], [20, 90], [21.5, 95], [21, 100], [0, 100],
-      ],
-      ripples: [
-        { x: 10, y: 88, delay: 0, width: 8 },
-        { x: 16, y: 94, delay: 1.6, width: 7 },
-        { x: 5, y: 82, delay: 3.1, width: 6 },
-      ],
-    },
-    {
-      polygon: [
-        [87, 55], [91, 50], [97, 49], [100, 51], [100, 65], [92, 65], [91, 70], [89, 74],
-        [87, 72], [86.5, 62],
-      ],
-      ripples: [
-        { x: 93, y: 57, delay: 0.8, width: 6 },
-        { x: 97, y: 62, delay: 2.4, width: 5 },
-      ],
-    },
-  ],
-  exterior: [
-    {
-      polygon: [
-        [33, 91], [36, 84], [42, 78], [50, 73], [56, 69.5], [57, 74], [60, 82], [66, 82],
-        [69, 74], [69, 68.5], [74, 69.5], [82, 73], [88, 78], [94, 81], [98, 83], [96, 85],
-        [90, 88], [84, 92], [78, 96], [70, 99], [60, 100], [40, 100], [34, 97],
-      ],
-      ripples: [
-        { x: 45, y: 86, delay: 0, width: 10 },
-        { x: 60, y: 90, delay: 1.2, width: 11 },
-        { x: 75, y: 84, delay: 2.3, width: 9 },
-        { x: 88, y: 86, delay: 3.4, width: 8 },
-        { x: 52, y: 78, delay: 4.1, width: 7 },
-      ],
-    },
-  ],
+export interface WaveParams {
+  wavelength: number;
+  period: number;
+  weight?: number;
+  phase?: number;
+}
+
+export interface RingParams {
+  every: number;
+  life: number;
+  alpha: number;
+  grow: number;
+  flatten: number;
+  lineWidth: number;
+}
+
+/** 每帧水面画布需要的全部参数；数值都按 1600×900 参考像素给出。 */
+export interface WaterSpec {
+  mask: string;
+  regions: WaterRegion[];
+  ampTop: number;
+  ampBottom: number;
+  strip: number;
+  wave1: WaveParams;
+  wave2: WaveParams;
+  glints: number;
+  glintLife: number;
+  glintAlpha: number;
+  glintColor: string;
+  glintLengthTop: number;
+  glintLengthBottom: number;
+  glintThicknessTop: number;
+  glintThicknessBottom: number;
+  rings?: RingParams;
+}
+
+export const SCENE_REF_W = 1600;
+export const SCENE_REF_H = 900;
+
+export const WATER: Record<SceneId, WaterSpec> = {
+  interior: {
+    mask: 'art/props/interior/water-mask.png',
+    regions: [
+      { left: 0.0, top: 76.33, width: 21.19, height: 21.33 },
+      { left: 86.56, top: 52.0, width: 11.88, height: 23.22 },
+    ],
+    ampTop: 0.5,
+    ampBottom: 1.4,
+    strip: 2,
+    wave1: { wavelength: 46, period: 3.8 },
+    wave2: { wavelength: 17, period: 2.3, weight: 0.45, phase: 0.3 },
+    glints: 9,
+    glintLife: 3.2,
+    glintAlpha: 0.5,
+    glintColor: '#f4fbf6',
+    glintLengthTop: 9,
+    glintLengthBottom: 20,
+    glintThicknessTop: 1.2,
+    glintThicknessBottom: 2.4,
+  },
+  exterior: {
+    mask: 'art/props/exterior/water-mask.png',
+    regions: [{ left: 32.75, top: 71.56, width: 67.25, height: 28.44 }],
+    ampTop: 0.5,
+    ampBottom: 2.2,
+    strip: 2,
+    wave1: { wavelength: 46, period: 3.8 },
+    wave2: { wavelength: 17, period: 2.3, weight: 0.45, phase: 0.3 },
+    glints: 26,
+    glintLife: 3.2,
+    glintAlpha: 0.5,
+    glintColor: '#f4fbf6',
+    glintLengthTop: 9,
+    glintLengthBottom: 30,
+    glintThicknessTop: 1.2,
+    glintThicknessBottom: 2.4,
+    rings: { every: 7, life: 3.2, alpha: 0.35, grow: 26, flatten: 0.3, lineWidth: 1.6 },
+  },
 };
 
-export function clipPath(region: WaterRegion): string {
-  return `polygon(${region.polygon.map(([x, y]) => `${x}% ${y}%`).join(', ')})`;
+/** 0（区域顶）→ 1（区域底）的线性深度。 */
+export function regionDepth(yRef: number, region: WaterRegion): number {
+  const topRef = (region.top / 100) * SCENE_REF_H;
+  const bottomRef = ((region.top + region.height) / 100) * SCENE_REF_H;
+  if (bottomRef === topRef) return 0;
+  return Math.min(1, Math.max(0, (yRef - topRef) / (bottomRef - topRef)));
+}
+
+/** 水域横条在 yRef 处、时间 t 秒时的水平偏移（参考像素）。 */
+export function waveOffset(yRef: number, t: number, region: WaterRegion, spec: WaterSpec): number {
+  const amp = spec.ampTop + (spec.ampBottom - spec.ampTop) * regionDepth(yRef, region);
+  const w1 = spec.wave1;
+  const w2 = spec.wave2;
+  const a1 = Math.sin(2 * Math.PI * (yRef / w1.wavelength - t / w1.period));
+  const a2 = Math.sin(2 * Math.PI * (yRef / w2.wavelength + t / w2.period + (w2.phase ?? 0)));
+  return amp * (a1 + (w2.weight ?? 0) * a2);
+}
+
+/** [top, bottom] 端点按深度线性插值。 */
+export function interpByDepth(top: number, bottom: number, depth: number): number {
+  return top + (bottom - top) * depth;
+}
+
+/** sin² 淡入淡出包络（0→1→0）。 */
+export function glintEnvelope(age: number, life: number): number {
+  if (life <= 0 || age < 0 || age > life) return 0;
+  const s = Math.sin((Math.PI * age) / life);
+  return s * s;
+}
+
+/** 荷叶扁椭圆涟漪：给定生命比例（0..1），返回 {rx, alpha}。 */
+export function ringShape(depth: number, grow: number, alpha: number): { radius: number; alpha: number } {
+  const d = Math.min(1, Math.max(0, depth));
+  return { radius: grow * d, alpha: alpha * (1 - d) };
 }
