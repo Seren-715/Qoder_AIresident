@@ -75,6 +75,16 @@ h1 {
   z-index: 4;
 }
 
+.props-clouds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+}
+
 .prop {
   position: absolute;
   display: block;
@@ -95,7 +105,7 @@ h1 {
 }
 
 .prop-auto-drift {
-  animation: prop-drift var(--dur, 60s) ease-in-out var(--delay, 0s) infinite alternate;
+  animation: prop-drift var(--dur, 60s) linear var(--delay, 0s) infinite;
 }
 
 @keyframes prop-swing {
@@ -118,10 +128,10 @@ h1 {
 
 @keyframes prop-drift {
   from {
-    margin-left: calc(var(--min, 0) * 1%);
+    left: var(--from);
   }
   to {
-    margin-left: calc(var(--max, 0) * 1%);
+    left: var(--to);
   }
 }
 

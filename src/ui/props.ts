@@ -22,8 +22,8 @@ function buildProp(spec: PropSpec, reduced: boolean): HTMLImageElement {
     img.style.setProperty('--delay', `${spec.delay ?? 0}s`);
     img.classList.add(`prop-auto-${spec.motion}`);
     if (spec.motion === 'drift') {
-      img.style.setProperty('--min', String(spec.driftMin ?? 0));
-      img.style.setProperty('--max', String(spec.driftMax ?? 0));
+      img.style.setProperty('--from', `${spec.travelFrom!}%`);
+      img.style.setProperty('--to', `${spec.travelTo!}%`);
     } else {
       img.style.setProperty('--amp', String(spec.amplitude ?? 0));
     }
@@ -58,9 +58,19 @@ export function renderProps(
 ): void {
   backEl.replaceChildren();
   frontEl.replaceChildren();
+  let cloudLayer: HTMLDivElement | undefined;
+  if (scene === 'exterior') {
+    cloudLayer = document.createElement('div');
+    cloudLayer.className = 'props-clouds';
+    const maskImage = `url("${assetUrl('art/props/exterior/sky-mask.png')}")`;
+    cloudLayer.style.maskImage = maskImage;
+    cloudLayer.style.setProperty('-webkit-mask-image', maskImage);
+    backEl.appendChild(cloudLayer);
+  }
   for (const spec of PROPS[scene].props) {
     const img = buildProp(spec, reduced);
-    (spec.layer === 'front' ? frontEl : backEl).appendChild(img);
+    const target = spec.layer === 'front' ? frontEl : spec.motion === 'drift' ? cloudLayer! : backEl;
+    target.appendChild(img);
   }
 }
 

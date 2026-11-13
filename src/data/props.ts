@@ -18,8 +18,8 @@ export interface PropSpec {
   period: number;
   layer: PropLayer;
   amplitude?: number;
-  driftMin?: number;
-  driftMax?: number;
+  travelFrom?: number;
+  travelTo?: number;
   delay?: number;
 }
 
@@ -46,9 +46,9 @@ export const PROPS: Record<SceneId, SceneProps> = {
   exterior: {
     background: 'art/room-exterior-clean.webp',
     props: [
-      { id: 'cloud-a', image: 'art/props/exterior/cloud-a.png', left: 75.0, top: 8.08, width: 11.66, height: 7.76, motion: 'drift', trigger: 'auto', period: 70, layer: 'back', driftMin: -2.69, driftMax: 4.19, delay: 0 },
-      { id: 'cloud-b', image: 'art/props/exterior/cloud-b.png', left: 69.26, top: 19.87, width: 6.76, height: 4.46, motion: 'drift', trigger: 'auto', period: 55, layer: 'back', driftMin: 0.0, driftMax: 4.78, delay: -20 },
-      { id: 'cloud-c', image: 'art/props/exterior/cloud-c.png', left: 90.31, top: 16.26, width: 7.24, height: 4.99, motion: 'drift', trigger: 'auto', period: 62, layer: 'back', driftMin: -2.99, driftMax: 2.39, delay: -35 },
+      { id: 'cloud-a', image: 'art/props/exterior/cloud-a.png', left: 75.0, top: 8.08, width: 11.66, height: 7.76, motion: 'drift', trigger: 'auto', period: 46.9, layer: 'back', delay: -19.1, travelFrom: 57.78, travelTo: 100.0 },
+      { id: 'cloud-b', image: 'art/props/exterior/cloud-b.png', left: 69.26, top: 19.87, width: 6.76, height: 4.46, motion: 'drift', trigger: 'auto', period: 69.0, layer: 'back', delay: -25.1, travelFrom: 51.67, travelTo: 100.0 },
+      { id: 'cloud-c', image: 'art/props/exterior/cloud-c.png', left: 90.31, top: 16.26, width: 7.24, height: 4.99, motion: 'drift', trigger: 'auto', period: 38.7, layer: 'back', delay: -29.9, travelFrom: 57.42, travelTo: 100.0 },
       { id: 'door-lantern', image: 'art/props/exterior/door-lantern.png', left: 47.85, top: 35.39, width: 2.81, height: 8.08, originX: 46.8, originY: 6.6, motion: 'swing', trigger: 'auto', period: 3.6, layer: 'back', amplitude: 2.5, delay: 0 },
       { id: 'cloth-1', image: 'art/props/exterior/cloth-1.png', left: 54.55, top: 41.66, width: 3.41, height: 7.86, originX: 50.9, originY: 21.6, motion: 'skew', trigger: 'auto', period: 2.8, layer: 'back', amplitude: 3, delay: 0 },
       { id: 'cloth-2', image: 'art/props/exterior/cloth-2.png', left: 58.73, top: 42.08, width: 3.17, height: 7.44, originX: 47.2, originY: 18.6, motion: 'skew', trigger: 'auto', period: 3.3, layer: 'back', amplitude: 3, delay: -1.1 },

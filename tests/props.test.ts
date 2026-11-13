@@ -60,15 +60,31 @@ describe('物件分层数据', () => {
     }
   });
 
-  it('摆动与斜切有正幅度，云的范围按场景宽度定义且有上下界', () => {
+  it('摆动与斜切有正幅度，云的左右边缘范围有效', () => {
     for (const prop of allProps) {
       if (prop.motion === 'drift') {
-        expect(prop.driftMin).toBeDefined();
-        expect(prop.driftMax).toBeDefined();
-        expect(prop.driftMin!).toBeLessThan(prop.driftMax!);
+        expect(prop.travelFrom).toBeDefined();
+        expect(prop.travelTo).toBeDefined();
+        expect(prop.travelFrom!).toBeGreaterThanOrEqual(0);
+        expect(prop.travelFrom!).toBeLessThan(prop.travelTo!);
+        expect(prop.travelTo!).toBeLessThanOrEqual(100);
       } else {
         expect(prop.amplitude).toBeGreaterThan(0);
       }
+    }
+  });
+
+  it('云的负延迟让初始位置贴合原图，速度保持在交付范围内', () => {
+    const clouds = PROPS.exterior.props.filter((prop) => prop.motion === 'drift');
+    expect(clouds).toHaveLength(3);
+    for (const cloud of clouds) {
+      const progress = -cloud.delay! / cloud.period;
+      const initialLeft = cloud.travelFrom! + (cloud.travelTo! - cloud.travelFrom!) * progress;
+      const speed = (cloud.travelTo! - cloud.travelFrom!) / cloud.period;
+      const roundedSpeed = Number(speed.toFixed(1));
+      expect(initialLeft).toBeCloseTo(cloud.left, 1);
+      expect(roundedSpeed).toBeGreaterThanOrEqual(0.7);
+      expect(roundedSpeed).toBeLessThanOrEqual(1.1);
     }
   });
 });
