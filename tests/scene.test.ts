@@ -65,4 +65,18 @@ describe('场景数据', () => {
       expect(a.top + a.height).toBeLessThanOrEqual(100);
     }
   });
+
+  it('家具木牌文字与 Spec 2.4 一致', () => {
+    expect(FURNITURE.bed.action!.hint).toBe('叫它去睡觉');
+    expect(FURNITURE.bowl.action!.hint).toBe('叫它去吃饭');
+    expect(FURNITURE.bookshelf.action!.hint).toBe('叫它去看书');
+    expect(FURNITURE.desk.action!.hint).toBe('叫它去写代码');
+    expect(FURNITURE.window.action!.hint).toBe('叫它去发会儿呆');
+    expect(FURNITURE.rug.action!.hint).toBe('叫它去打个滚');
+  });
+
+  it('门牌区分屋内屋外', () => {
+    expect(SCENES.interior.doorSign).toBe('出门看看 →');
+    expect(SCENES.exterior.doorSign).toBe('← 回家');
+  });
 });

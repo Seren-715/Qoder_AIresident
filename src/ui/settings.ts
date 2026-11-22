@@ -10,15 +10,21 @@ import { loadAiConfig, saveAiConfig } from '../storage/settings';
 
 export interface SettingsOptions {
   onRestart?: () => void;
+  /** 面板入口按钮；不传就在场景里自己创建一个。 */
+  trigger?: HTMLElement;
 }
 
 export function mountSettings(sceneEl: HTMLElement, options: SettingsOptions = {}): void {
-  const gear = document.createElement('button');
-  gear.type = 'button';
-  gear.className = 'gear';
-  gear.textContent = '设置';
-  gear.setAttribute('aria-label', '游戏设置');
-  sceneEl.appendChild(gear);
+  let gear = options.trigger;
+  if (!gear) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'gear';
+    btn.textContent = '设置';
+    btn.setAttribute('aria-label', '游戏设置');
+    sceneEl.appendChild(btn);
+    gear = btn;
+  }
 
   const overlay = document.createElement('div');
   overlay.className = 'settings';

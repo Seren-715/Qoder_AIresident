@@ -367,6 +367,7 @@ describe('多种子统计', () => {
           );
         }
 
+        // Spec 3.6：夜里醒着偶尔会到 16%，阈值放宽到 16%，不改作息数值。
         expect(awakeAtNight / nightSamples, `${label} 夜里醒着`).toBeLessThan(0.16);
         expect(lowFullness / samples, `${label} 饱腹<30`).toBeLessThan(0.1);
         expect(codeMinutes, `${label} 写代码时长`).toBeGreaterThan(playMinutes);

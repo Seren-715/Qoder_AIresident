@@ -8,6 +8,8 @@ export interface ChatPanel {
 
 export interface ChatOptions {
   getContext: () => ChatContext;
+  /** 聊天面板挂到哪；默认整页。 */
+  container?: HTMLElement;
 }
 
 export function mountChat(options: ChatOptions): ChatPanel {
@@ -29,7 +31,7 @@ export function mountChat(options: ChatOptions): ChatPanel {
       </form>
     </div>
   `;
-  document.body.appendChild(overlay);
+  (options.container ?? document.body).appendChild(overlay);
 
   const log = overlay.querySelector<HTMLElement>('.chat-log')!;
   const nowLine = overlay.querySelector<HTMLElement>('.chat-now')!;

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { formatGameTime, isNight, minuteOfDay, toGameMinute } from '../src/sim/time';
+import {
+  formatClock,
+  formatDateLabel,
+  formatGameTime,
+  isNight,
+  minuteOfDay,
+  toGameMinute,
+} from '../src/sim/time';
 
 describe('游戏时间', () => {
   it('2026-01-01 00:00 北京时间是第 0 分钟', () => {
@@ -23,5 +30,13 @@ describe('游戏时间', () => {
     expect(formatGameTime(12 * 60 + 34)).toBe('1 月 1 日 12:34');
     expect(formatGameTime(24 * 60)).toBe('1 月 2 日 00:00');
     expect(formatGameTime(325 * 24 * 60)).toBe('11 月 22 日 00:00');
+  });
+
+  it('便签用的大号时间和日期行', () => {
+    expect(formatClock(0)).toBe('00:00');
+    expect(formatClock(22 * 60 + 15)).toBe('22:15');
+    expect(formatClock(24 * 60 + 5)).toBe('00:05');
+    expect(formatDateLabel(0)).toBe('1 月 1 日 · 周四');
+    expect(formatDateLabel(325 * 24 * 60 + 22 * 60 + 15)).toBe('11 月 22 日 · 周日');
   });
 });
