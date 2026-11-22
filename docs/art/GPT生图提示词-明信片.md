@@ -77,6 +77,37 @@ A cool mountain bamboo forest: an old stone stairway winding up through a dense 
 Huangshan mountains above a sea of clouds: sharp granite peaks rising out of soft white flat clouds that flow between them, a twisted old pine tree growing out of a rock crack on the left cliff edge with one long branch reaching out like a welcoming arm, a narrow stone stairway with a simple railing carved along the cliff in the foreground, distant peaks fading into pale blue.
 ```
 
+### 5（第二版）`moganshan` 莫干山：第一次结果画风偏了
+
+**第一次的问题**：画得太细、太暗，像动画电影的背景，不像屋外全景那种简单的绘本画。
+
+| 偏在哪 | 原因 | 第二版怎么改 |
+|---|---|---|
+| 几百根竹子、每片叶子都画出来 | 写了「茂密的竹海」，竹子本身又全是细线 | 只画几丛竹子，叶子画成成团的扁平色块，像参考图里树冠的画法 |
+| 整体暗绿、没有天空 | 画面被竹子塞满，像在隧道里 | 视角拉远，上方留出淡色天空，远处是圆圆的山 |
+| 光斑、渐变 | 写了「透下来的光斑」 | 删掉光斑，只用一种深一档的扁平阴影 |
+| 石屋砖块、石阶纹理很细 | 没限制细节 | 明确要求「大块面、少细节」 |
+
+**生成方法**：新开对话，上传 `room-exterior.webp`，**不要贴通用部分**，直接贴下面这整段（已经包含通用要求，并加强了「简单」）。
+
+```
+Please generate a LANDSCAPE image with a 3:2 aspect ratio.
+
+Use the image I uploaded as the art style reference and match it closely: the same thin dark brown slightly wobbly outlines, the same flat color fills with only one darker flat shade for shadows, the same subtle paper grain, the same light and airy muted palette, and the same LEVEL OF SIMPLICITY. Look at how the reference draws tree crowns: big rounded clumps of flat green with a few outline bumps, not individual leaves. Draw all foliage in this scene the same way.
+
+This is the picture side of a travel postcard in a cozy web game, drawn like a simple children's picture book page. Big simple shapes, very few small details, plenty of calm empty space. No characters, no people, no animals, no ducks. No text, no signs.
+
+The scene: Moganshan mountain in summer, seen from a gentle open viewpoint, not from inside a dense forest. In the foreground, an old stone stairway (drawn as a few large simple steps, no brick texture) climbs gently from the bottom center toward the right. Beside the stairs on the left, a small clear stream with one short little waterfall over two or three big rounded mossy rocks. Left and right edges: just a few clumps of bamboo, maybe six to eight stalks on each side, with leaves drawn as soft rounded clumps of flat green like the tree crowns in the reference. In the middle ground on a green slope, a small old stone villa with a red-tiled roof and a wooden balcony, clearly visible, about the same size as the shed in the reference. Background: soft rounded green hills fading to pale sage, and a pale cream-blue sky with one or two simple clouds taking up the top quarter of the image.
+
+Colors: light and warm like the reference: pale sky, beige stone, sage and moss greens (not dark olive), dusty blue water, coral red roof.
+
+Avoid: a dense wall of bamboo, a tunnel-like forest, hundreds of thin lines, individual leaves, dappled light spots, sun rays, gradients, dark or gloomy colors, detailed brick or stone texture, anime film background style, realistic painting, photorealism, 3D rendering, thick cartoon outlines, saturated colors, people, animals, text, watermark, borders, portrait orientation.
+```
+
+**如果还是太细**：不要在原图上改，再新开一次，在场景描述最后加一句：`Even simpler: half as many objects, larger shapes.`
+
+**另外**：`yunqi` 云栖小镇的画面也有竹林，生成时如果也出现一整面密竹，按这里同样的方法改：竹子只画几丛，叶子画成成团的扁平色块，上方留出天空。
+
 ---
 
 ## 如果只差一点（只改一次）
