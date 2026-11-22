@@ -8,7 +8,11 @@ import {
 } from '../data/ai';
 import { loadAiConfig, saveAiConfig } from '../storage/settings';
 
-export function mountSettings(sceneEl: HTMLElement): void {
+export interface SettingsOptions {
+  onRestart?: () => void;
+}
+
+export function mountSettings(sceneEl: HTMLElement, options: SettingsOptions = {}): void {
   const gear = document.createElement('button');
   gear.type = 'button';
   gear.className = 'gear';
@@ -27,6 +31,7 @@ export function mountSettings(sceneEl: HTMLElement): void {
       </header>
       <div class="settings-menu">
         <button type="button" class="settings-item">配置API</button>
+        <button type="button" class="settings-item settings-restart">重新开始</button>
       </div>
       <form class="settings-form" hidden>
         <label>服务商
@@ -88,6 +93,12 @@ export function mountSettings(sceneEl: HTMLElement): void {
     menu.hidden = true;
     form.hidden = false;
     fill(loadAiConfig());
+  });
+  overlay.querySelector<HTMLButtonElement>('.settings-restart')!.addEventListener('click', () => {
+    if (!options.onRestart) return;
+    if (!window.confirm('确定要重新开始吗？小黄鸭现在的生活记录会被清空。')) return;
+    options.onRestart();
+    close();
   });
   overlay.querySelector<HTMLButtonElement>('.settings-back')!.addEventListener('click', showMenu);
   provider.addEventListener('change', () => {

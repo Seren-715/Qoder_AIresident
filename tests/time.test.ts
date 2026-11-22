@@ -1,0 +1,26 @@
+import { describe, expect, it } from 'vitest';
+import { formatGameTime, isNight, minuteOfDay, toGameMinute } from '../src/sim/time';
+
+describe('游戏时间', () => {
+  it('2026-01-01 00:00 北京时间是第 0 分钟', () => {
+    expect(toGameMinute(Date.UTC(2025, 11, 31, 16, 0, 0))).toBe(0);
+    expect(toGameMinute(Date.UTC(2025, 11, 31, 16, 0, 59))).toBe(0);
+    expect(toGameMinute(Date.UTC(2025, 11, 31, 16, 1, 0))).toBe(1);
+  });
+
+  it('一天内的分钟与夜里判断', () => {
+    expect(minuteOfDay(0)).toBe(0);
+    expect(minuteOfDay(24 * 60 + 30)).toBe(30);
+    expect(isNight(23 * 60)).toBe(true);
+    expect(isNight(0)).toBe(true);
+    expect(isNight(6 * 60 + 59)).toBe(true);
+    expect(isNight(7 * 60)).toBe(false);
+    expect(isNight(12 * 60)).toBe(false);
+  });
+
+  it('游戏时间显示为第几天和时分', () => {
+    expect(formatGameTime(0)).toBe('第 1 天 00:00');
+    expect(formatGameTime(12 * 60 + 34)).toBe('第 1 天 12:34');
+    expect(formatGameTime(24 * 60)).toBe('第 2 天 00:00');
+  });
+});
