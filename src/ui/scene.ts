@@ -1,3 +1,4 @@
+import { buildChatContext } from '../ai/context';
 import { ACTIVITIES, activityAtFurniture } from '../data/life';
 import {
   EXTERIOR_DOOR,
@@ -13,7 +14,7 @@ import {
 } from '../data/scene';
 import { createClock, setClockSpeed, SPEEDS, tickClock, type GameClock, type Speed } from '../sim/clock';
 import { advance, createInitialLife, suggestActivity, type LifeState } from '../sim/life';
-import { catchUpLife, summarizeAway, type AwaySummary } from '../sim/offline';
+import { catchUpLife, catchUpTarget, summarizeAway, type AwaySummary } from '../sim/offline';
 import { formatGameTime, toGameMinute } from '../sim/time';
 import { clearLife, DEFAULT_NAME, loadLife, saveLife } from '../storage/life';
 import { mountChat } from './chat';
@@ -114,17 +115,27 @@ export function mountScene(root: HTMLElement): void {
     return (Math.random() * 0x100000000) >>> 0;
   }
 
+  function newSaveId(): string {
+    return `s${Date.now().toString(36)}-${Math.floor(Math.random() * 0x100000000).toString(36)}`;
+  }
+
   const loaded = loadLife();
   let name = DEFAULT_NAME;
   let life: LifeState;
   let awaySummary: AwaySummary | null = null;
   if (loaded) {
     name = loaded.name;
-    const result = catchUpLife(loaded.state, toGameMinute(Date.now()));
+    const realNow = toGameMinute(Date.now());
+    const target = catchUpTarget(loaded.state.minute, loaded.aheadMinutes, realNow);
+    const result = catchUpLife(loaded.state, target);
     life = result.state;
     awaySummary = summarizeAway(name, result);
   } else {
-    life = createInitialLife({ seed: newSeed(), atMinute: toGameMinute(Date.now()) });
+    life = createInitialLife({
+      seed: newSeed(),
+      atMinute: toGameMinute(Date.now()),
+      saveId: newSaveId(),
+    });
   }
   let clock: GameClock = createClock(life.minute, Date.now());
   const water: WaterController = mountWater(waterCanvas, bg, 'interior', reducedMotion.matches);
@@ -168,7 +179,7 @@ export function mountScene(root: HTMLElement): void {
   }
 
   function persist(): void {
-    saveLife(name, life);
+    saveLife(name, life, life.minute - toGameMinute(Date.now()));
   }
 
   function setSpeed(next: Speed): void {
@@ -181,7 +192,11 @@ export function mountScene(root: HTMLElement): void {
   function restart(): void {
     clearLife();
     name = DEFAULT_NAME;
-    life = createInitialLife({ seed: newSeed(), atMinute: toGameMinute(Date.now()) });
+    life = createInitialLife({
+      seed: newSeed(),
+      atMinute: toGameMinute(Date.now()),
+      saveId: newSaveId(),
+    });
     clock = createClock(life.minute, Date.now());
     away.hidden = true;
     for (const btn of speedButtons) {
@@ -251,7 +266,7 @@ export function mountScene(root: HTMLElement): void {
     renderProps(propsBack, propsFront, currentScene, reducedMotion.matches);
     water.setReduced(reducedMotion.matches);
   });
-  const chat = mountChat();
+  const chat = mountChat({ getContext: () => buildChatContext(life, name) });
   mountSettings(sceneEl, { onRestart: restart });
   awayClose.addEventListener('click', () => {
     away.hidden = true;

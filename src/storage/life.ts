@@ -17,6 +17,7 @@ const EVENT_TYPES = new Set<string>(['start', 'end', 'interrupt', 'interact']);
 
 export interface LifeSave {
   name: string;
+  aheadMinutes: number;
   state: LifeState;
 }
 
@@ -171,17 +172,24 @@ export function loadLife(): LifeSave | null {
     if (!isRecord(data) || data.version !== VERSION) return null;
     const state = parseState(data.state);
     if (!state) return null;
-    return { name: normalizeName(data.name), state };
+    let aheadMinutes = 0;
+    if (data.aheadMinutes !== undefined) {
+      if (!isInteger(data.aheadMinutes, 0, Number.MAX_SAFE_INTEGER)) return null;
+      aheadMinutes = data.aheadMinutes;
+    }
+    return { name: normalizeName(data.name), aheadMinutes, state };
   } catch {
     return null;
   }
 }
 
-export function saveLife(name: string, state: LifeState): void {
+export function saveLife(name: string, state: LifeState, aheadMinutes = 0): void {
+  const ahead =
+    Number.isFinite(aheadMinutes) && aheadMinutes > 0 ? Math.round(aheadMinutes) : 0;
   try {
     localStorage.setItem(
       LIFE_KEY,
-      JSON.stringify({ version: VERSION, name: normalizeName(name), state }),
+      JSON.stringify({ version: VERSION, name: normalizeName(name), aheadMinutes: ahead, state }),
     );
   } catch {
     // 浏览器禁用存储或额度用完时，生活照常继续，只是不落盘。

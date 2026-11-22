@@ -107,7 +107,67 @@ describe('生活模拟', () => {
     expect(before.energy).toBe(80);
     expect(after.fullness).toBeCloseTo(70 - (10 * 6) / 60, 6);
     expect(after.energy).toBeCloseTo(80 - (10 * 4) / 60 - (10 * 10) / 60, 6);
-    expect(after.mood).toBeCloseTo(70 + (10 * 8) / 60, 6);
+    expect(after.mood).toBeCloseTo(70 + (10 * 15) / 60, 6);
+  });
+
+  it('心情朝目标值靠拢，不会被娱乐顶满', () => {
+    const activity: LifeActivity = {
+      id: 'test-a1',
+      kind: 'code',
+      startedAt: 600,
+      endsAt: 720,
+      statsAtStart: { fullness: 80, energy: 80, mood: 70 },
+    };
+    const state = manualState(activity, { mood: 70, fullness: 80, energy: 80 });
+    const after = advance(state, 720);
+    expect(after.mood).toBeGreaterThan(70);
+    expect(after.mood).toBeLessThanOrEqual(82);
+    expect(after.mood).toBeLessThan(100);
+  });
+
+  it('又饿又累时心情会降下来，但不会掉到 0', () => {
+    const activity: LifeActivity = {
+      id: 'test-a1',
+      kind: 'gaze',
+      startedAt: 600,
+      endsAt: 960,
+      statsAtStart: { fullness: 10, energy: 10, mood: 70 },
+    };
+    const state = manualState(activity, { mood: 70, fullness: 10, energy: 10 });
+    const after = advance(state, 959);
+    expect(after.mood).toBeLessThan(30);
+    expect(after.mood).toBeGreaterThan(0);
+  });
+
+  it('7 天里心情有变化，不会一直顶满或掉到 0', () => {
+    let state = createInitialLife({ seed: 20261113, atMinute: 8 * 60 });
+    const end = state.minute + 7 * 24 * 60;
+    let min = 100;
+    let max = 0;
+    let at100 = 0;
+    let samples = 0;
+    while (state.minute < end) {
+      state = advance(state, Math.min(state.minute + 10, end));
+      min = Math.min(min, state.mood);
+      max = Math.max(max, state.mood);
+      if (state.mood >= 99.9) at100++;
+      samples++;
+    }
+    expect(max).toBeLessThan(100);
+    expect(min).toBeGreaterThan(0);
+    expect(max - min).toBeGreaterThan(20);
+    expect(at100 / samples).toBeLessThan(0.1);
+  });
+
+  it('不同开局的活动编号不会重复', () => {
+    const a = createInitialLife({ seed: 1, atMinute: 600, saveId: 'a' });
+    const b = createInitialLife({ seed: 1, atMinute: 600, saveId: 'b' });
+    expect(a.activity?.id.startsWith('a-')).toBe(true);
+    expect(b.activity?.id.startsWith('b-')).toBe(true);
+    const idsA = new Set(a.events.map((e) => e.activityId).filter(Boolean));
+    for (const id of b.events.map((e) => e.activityId).filter(Boolean)) {
+      expect(idsA.has(id)).toBe(false);
+    }
   });
 
   it('完整做完记 end，被打断记 interrupt 且不记 end', () => {

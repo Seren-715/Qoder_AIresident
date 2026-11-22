@@ -4,6 +4,15 @@ import { advance, type LifeEvent, type LifeState } from './life';
 export const MAX_CATCH_UP_MINUTES = 7 * 24 * 60;
 export const SUMMARY_THRESHOLD_MINUTES = 10;
 
+export function catchUpTarget(
+  savedMinute: number,
+  aheadMinutes: number,
+  realNowMinute: number,
+): number {
+  const ahead = Number.isFinite(aheadMinutes) ? Math.max(0, Math.floor(aheadMinutes)) : 0;
+  return Math.max(savedMinute, realNowMinute + ahead);
+}
+
 export interface CatchUpResult {
   state: LifeState;
   fromMinute: number;
@@ -20,12 +29,12 @@ export interface AwaySummary {
 }
 
 const PHRASES: Record<ActivityId, (count: number) => string> = {
-  sleep: (count) => `睡了 ${count} 次觉`,
+  sleep: (count) => (count === 1 ? '睡了一觉' : `睡了 ${count} 次觉`),
   eat: (count) => `吃了 ${count} 次饭`,
-  read: (count) => `看了 ${count} 会儿书`,
-  code: (count) => `写了 ${count} 会儿代码`,
-  play: (count) => `打了 ${count} 次滚`,
-  gaze: (count) => `发了 ${count} 次呆`,
+  read: (count) => (count === 1 ? '看了一会儿书' : `看了 ${count} 次书`),
+  code: (count) => (count === 1 ? '写了一会儿代码' : `写了 ${count} 次代码`),
+  play: (count) => (count === 1 ? '打了一会儿滚' : `打了 ${count} 次滚`),
+  gaze: (count) => (count === 1 ? '发了一会儿呆' : `发了 ${count} 次呆`),
 };
 
 const PHRASE_ORDER: ActivityId[] = ['sleep', 'eat', 'read', 'code', 'play', 'gaze'];

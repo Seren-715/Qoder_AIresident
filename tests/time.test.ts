@@ -18,9 +18,10 @@ describe('游戏时间', () => {
     expect(isNight(12 * 60)).toBe(false);
   });
 
-  it('游戏时间显示为第几天和时分', () => {
-    expect(formatGameTime(0)).toBe('第 1 天 00:00');
-    expect(formatGameTime(12 * 60 + 34)).toBe('第 1 天 12:34');
-    expect(formatGameTime(24 * 60)).toBe('第 2 天 00:00');
+  it('游戏时间显示为月日和时分', () => {
+    expect(formatGameTime(0)).toBe('1 月 1 日 00:00');
+    expect(formatGameTime(12 * 60 + 34)).toBe('1 月 1 日 12:34');
+    expect(formatGameTime(24 * 60)).toBe('1 月 2 日 00:00');
+    expect(formatGameTime(325 * 24 * 60)).toBe('11 月 22 日 00:00');
   });
 });

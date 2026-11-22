@@ -1,3 +1,5 @@
+import type { ChatContext } from './context';
+
 const GENERIC = [
   '嘎？我在听呢，你慢慢说。',
   '嗯嗯，我把这句话记在小本本上了。',
@@ -28,13 +30,63 @@ const RULES: { keywords: string[]; replies: string[] }[] = [
   },
 ];
 
-export function pickFallback(message: string): string {
-  let hash = 0;
-  for (const ch of message) hash = (hash * 31 + ch.codePointAt(0)!) >>> 0;
+function hash(message: string): number {
+  let value = 0;
+  for (const ch of message) value = (value * 31 + ch.codePointAt(0)!) >>> 0;
+  return value;
+}
+
+function contextReply(message: string, context: ChatContext): string | null {
+  const { now } = context;
+
+  if (/在干嘛|做什么|干什么|在做什么|忙什么/.test(message)) {
+    if (now.activity === '睡觉') return '呼……我在睡觉呢。';
+    if (now.activity === '吃饭') return '我在吃饭呢，嘎。';
+    if (now.activity === '看书') return '我在看书，正看到有意思的地方。';
+    if (now.activity === '写代码') return '我在写代码，刚被一个 bug 卡住。';
+    if (now.activity === '发呆') return '我在窗边发呆，看云飘过去。';
+    if (now.activity === '打滚') return '我在地毯上打滚，可圆了。';
+    return `我在${now.activity}，陪你待一会儿。`;
+  }
+
+  if (/饿|吃|饭|零食/.test(message)) {
+    if (now.activity === '吃饭') return '正在吃饭呢，嘎。';
+    if (now.fullness < 30) return '有点饿了，等下就去饭碗那边。';
+    return '还不饿，饭碗里还有吃的。';
+  }
+
+  if (/睡|困|累|休息/.test(message)) {
+    if (now.activity === '睡觉') return '呼……我睡着呢。';
+    if (now.energy < 30) return '有点困了，想回床上躺一会儿。';
+    return '还不困，先陪你待会儿。';
+  }
+
+  if (/看书|读书|书/.test(message)) {
+    if (now.activity === '看书') return '正在看书呢。';
+    return '想找本书翻翻，你要一起看吗？';
+  }
+
+  if (/代码|写|工作|bug/i.test(message)) {
+    if (now.activity === '写代码') return '正在写代码，别催我。';
+    return '等会儿去写两行，先陪你聊。';
+  }
+
+  return null;
+}
+
+export function pickFallback(message: string, context?: ChatContext): string {
+  if (context) {
+    const reply = contextReply(message, context);
+    if (reply) return reply;
+  }
+
+  const code = hash(message);
   for (const rule of RULES) {
-    if (rule.keywords.some((k) => message.includes(k))) {
-      return rule.replies[hash % rule.replies.length];
+    if (rule.keywords.some((keyword) => message.includes(keyword))) {
+      return rule.replies[code % rule.replies.length];
     }
   }
-  return GENERIC[hash % GENERIC.length];
+
+  const generic = GENERIC[code % GENERIC.length];
+  return context ? `我在${context.now.activity}。${generic}` : generic;
 }

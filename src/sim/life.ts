@@ -4,6 +4,8 @@ import {
   FORCE,
   HOURLY,
   LOW_STAT_THRESHOLD,
+  MOOD,
+  MOOD_TARGET,
   NIGHT,
   REJECT_REASONS,
   START,
@@ -191,6 +193,18 @@ function startNextActivity(draft: LifeState, atMinute: number): void {
   startActivity(draft, kind, atMinute, randomInt(draft, def.minMinutes, def.maxMinutes));
 }
 
+function moodTarget(draft: LifeState): number {
+  let target = draft.activity ? MOOD_TARGET[draft.activity.kind] : MOOD.idleTarget;
+  const hungry = draft.fullness < LOW_STAT_THRESHOLD;
+  const tired = draft.energy < LOW_STAT_THRESHOLD;
+  if (hungry && tired) target = Math.min(target, MOOD.bothLowTarget);
+  else if (hungry || tired) target = Math.min(target, MOOD.lowTarget);
+  if (draft.fullness < FORCE.eatBelow || draft.energy < FORCE.sleepBelow) {
+    target = Math.min(target, MOOD.criticalTarget);
+  }
+  return target;
+}
+
 function applyMinute(draft: LifeState): void {
   const activity = draft.activity;
   if (!activity) return;
@@ -200,22 +214,19 @@ function applyMinute(draft: LifeState): void {
   draft.fullness += HOURLY.fullness / 60;
   if (activity.kind !== 'sleep') draft.energy += HOURLY.energy / 60;
 
-  draft.fullness = clamp(draft.fullness);
-  draft.energy = clamp(draft.energy);
-
-  if (draft.fullness < LOW_STAT_THRESHOLD || draft.energy < LOW_STAT_THRESHOLD) {
-    draft.mood += HOURLY.mood / 60;
-  }
-
   draft.fullness += (def.effects.fullness ?? 0) / duration;
   draft.energy += (def.effects.energy ?? 0) / duration;
-  draft.mood += (def.effects.mood ?? 0) / duration;
   if (def.energyToFull) {
     draft.energy += Math.max(0, 100 - activity.statsAtStart.energy) / duration;
   }
 
   draft.fullness = clamp(draft.fullness);
   draft.energy = clamp(draft.energy);
+
+  const target = moodTarget(draft);
+  const step = MOOD.pullPerHour / 60;
+  if (draft.mood < target) draft.mood = Math.min(target, draft.mood + step);
+  else if (draft.mood > target) draft.mood = Math.max(target, draft.mood - step);
   draft.mood = clamp(draft.mood);
 }
 

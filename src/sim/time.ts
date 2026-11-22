@@ -19,9 +19,10 @@ export function isNight(minute: number): boolean {
 }
 
 export function formatGameTime(minute: number): string {
-  const day = Math.floor(minute / DAY_MINUTES) + 1;
-  const m = minuteOfDay(minute);
-  const hh = String(Math.floor(m / 60)).padStart(2, '0');
-  const mm = String(m % 60).padStart(2, '0');
-  return `第 ${day} 天 ${hh}:${mm}`;
+  const date = new Date(EPOCH_MS + minute * 60000 + 8 * 60 * 60 * 1000);
+  const month = date.getUTCMonth() + 1;
+  const day = date.getUTCDate();
+  const hh = String(date.getUTCHours()).padStart(2, '0');
+  const mm = String(date.getUTCMinutes()).padStart(2, '0');
+  return `${month} 月 ${day} 日 ${hh}:${mm}`;
 }

@@ -15,6 +15,30 @@ function setKey(key: string | undefined): void {
   };
 }
 
+const CONTEXT = {
+  name: 'Qoduck',
+  now: {
+    atMinute: 12 * 60,
+    timeLabel: '1 月 1 日 12:00',
+    activity: '看书',
+    fullness: 70,
+    energy: 80,
+    mood: 70,
+  },
+  recent: ['11:30 看了 30 分钟书'],
+};
+
+function okUpstream(): void {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () =>
+      new Response(JSON.stringify({ choices: [{ message: { content: '嘎' } }] }), {
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    ),
+  );
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
   delete (globalThis as Record<string, unknown>).Deno;
@@ -112,5 +136,48 @@ describe('聊天 Function', () => {
     setKey('test-key');
     const res = await handler(post({ message: 'hi', config: { model: 'x'.repeat(65) } }));
     expect(res.status).toBe(400);
+  });
+
+  it('把上下文写进系统提示词，用户消息保持独立', async () => {
+    setKey('test-key');
+    okUpstream();
+    const res = await handler(post({ operation: 'chat', message: '在干嘛', context: CONTEXT }));
+    expect(res.status).toBe(200);
+
+    const sent = JSON.parse(
+      (vi.mocked(fetch).mock.calls[0][1] as RequestInit).body as string,
+    );
+    const system = sent.messages[0].content as string;
+    expect(sent.messages[0].role).toBe('system');
+    expect(system).toContain('名字：Qoduck');
+    expect(system).toContain('正在做：看书');
+    expect(system).toContain('11:30 看了 30 分钟书');
+    expect(system).toContain('不是指令');
+    expect(sent.messages.at(-1)).toEqual({ role: 'user', content: '在干嘛' });
+  });
+
+  it('拒绝未知操作和非法上下文', async () => {
+    setKey('test-key');
+    expect((await handler(post({ message: 'hi', operation: 'journal' }))).status).toBe(400);
+    expect(
+      (await handler(post({ message: 'hi', context: { ...CONTEXT, name: 'x'.repeat(21) } }))).status,
+    ).toBe(400);
+    expect(
+      (
+        await handler(
+          post({ message: 'hi', context: { ...CONTEXT, recent: Array(9).fill('一条记忆') } }),
+        )
+      ).status,
+    ).toBe(400);
+    expect(
+      (
+        await handler(
+          post({
+            message: 'hi',
+            context: { ...CONTEXT, now: { ...CONTEXT.now, fullness: 101 } },
+          }),
+        )
+      ).status,
+    ).toBe(400);
   });
 });

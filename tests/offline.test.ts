@@ -3,6 +3,7 @@ import type { ActivityId } from '../src/data/life';
 import {
   MAX_CATCH_UP_MINUTES,
   catchUpLife,
+  catchUpTarget,
   summarizeAway,
   type CatchUpResult,
 } from '../src/sim/offline';
@@ -89,6 +90,27 @@ describe('离线补算', () => {
     expect(result.state).toBe(saved);
     expect(result.events).toEqual([]);
   });
+
+  it('快进领先 50 小时后，离线 3 小时仍会补算', () => {
+    const realSave = 1000;
+    const ahead = 50 * 60;
+    const saved = createInitialLife({ seed: 5, atMinute: realSave + ahead });
+    const realNow = realSave + 180;
+    const target = catchUpTarget(saved.minute, ahead, realNow);
+
+    expect(target).toBe(saved.minute + 180);
+    const result = catchUpLife(saved, target);
+    expect(result.minutes).toBe(180);
+    expect(result.state.minute).toBe(saved.minute + 180);
+    expect(result.events.length).toBeGreaterThan(0);
+    expect(summarizeAway('Qoduck', result)?.body).toContain('3 小时');
+  });
+
+  it('补算目标不会让游戏时间倒流', () => {
+    const saved = stateAt(5000);
+    expect(catchUpTarget(saved.minute, 0, 1000)).toBe(5000);
+    expect(catchUpTarget(saved.minute, 600, 1000)).toBe(5000);
+  });
 });
 
 describe('你不在的时候总结', () => {
@@ -116,9 +138,9 @@ describe('你不在的时候总结', () => {
     const summary = summarizeAway('阿鸭', result)!;
     expect(summary.body).toContain('你不在的 2 小时 30 分钟里');
     expect(summary.body).toContain('阿鸭');
-    expect(summary.body).toContain('睡了 1 次觉');
+    expect(summary.body).toContain('睡了一觉');
     expect(summary.body).toContain('吃了 2 次饭');
-    expect(summary.body).toContain('写了 1 会儿代码');
+    expect(summary.body).toContain('写了一会儿代码');
     expect(summary.body).toContain('现在它在发呆。');
   });
 

@@ -591,6 +591,12 @@ h1 {
   padding: 4px 8px;
 }
 
+.chat-now {
+  padding: 6px 14px 0;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
 .chat-log {
   display: flex;
   flex-direction: column;

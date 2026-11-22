@@ -10,7 +10,7 @@ export interface ActivityDef {
   label: string;
   minMinutes: number;
   maxMinutes: number;
-  effects: Partial<Record<StatKey, number>>;
+  effects: Partial<Record<'fullness' | 'energy', number>>;
   energyToFull?: boolean;
   entertainment?: boolean;
   need: StatKey;
@@ -23,7 +23,7 @@ export const ACTIVITIES: Record<ActivityId, ActivityDef> = {
     label: '睡觉',
     minMinutes: 120,
     maxMinutes: 480,
-    effects: { mood: 5 },
+    effects: {},
     energyToFull: true,
     need: 'energy',
   },
@@ -33,7 +33,7 @@ export const ACTIVITIES: Record<ActivityId, ActivityDef> = {
     label: '吃饭',
     minMinutes: 20,
     maxMinutes: 40,
-    effects: { fullness: 50, mood: 5 },
+    effects: { fullness: 50 },
     need: 'fullness',
   },
   read: {
@@ -42,7 +42,7 @@ export const ACTIVITIES: Record<ActivityId, ActivityDef> = {
     label: '看书',
     minMinutes: 40,
     maxMinutes: 90,
-    effects: { mood: 10, energy: -5 },
+    effects: { energy: -5 },
     entertainment: true,
     need: 'mood',
   },
@@ -52,7 +52,7 @@ export const ACTIVITIES: Record<ActivityId, ActivityDef> = {
     label: '写代码',
     minMinutes: 40,
     maxMinutes: 120,
-    effects: { mood: 8, energy: -10 },
+    effects: { energy: -10 },
     entertainment: true,
     need: 'mood',
   },
@@ -62,7 +62,7 @@ export const ACTIVITIES: Record<ActivityId, ActivityDef> = {
     label: '发呆',
     minMinutes: 15,
     maxMinutes: 40,
-    effects: { mood: 6 },
+    effects: {},
     entertainment: true,
     need: 'mood',
   },
@@ -72,7 +72,7 @@ export const ACTIVITIES: Record<ActivityId, ActivityDef> = {
     label: '打滚',
     minMinutes: 15,
     maxMinutes: 30,
-    effects: { mood: 12, energy: -8, fullness: -5 },
+    effects: { energy: -8, fullness: -5 },
     entertainment: true,
     need: 'mood',
   },
@@ -84,13 +84,29 @@ export const START: Record<StatKey, number> = {
   mood: 70,
 };
 
-export const HOURLY: Record<StatKey, number> = {
+export const HOURLY = {
   fullness: -6,
   energy: -4,
-  mood: -3,
-};
+} as const;
 
 export const LOW_STAT_THRESHOLD = 30;
+
+export const MOOD_TARGET: Record<ActivityId, number> = {
+  sleep: 64,
+  eat: 66,
+  read: 78,
+  code: 82,
+  gaze: 68,
+  play: 76,
+};
+
+export const MOOD = {
+  idleTarget: 60,
+  lowTarget: 38,
+  bothLowTarget: 22,
+  criticalTarget: 15,
+  pullPerHour: 15,
+};
 
 export const NIGHT = {
   startMinute: 23 * 60,

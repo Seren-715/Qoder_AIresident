@@ -17,9 +17,25 @@ describe('生活存档', () => {
     saveLife('Qoduck', state);
     const save = loadLife();
     expect(save?.name).toBe('Qoduck');
+    expect(save?.aheadMinutes).toBe(0);
     expect(save?.state).toEqual(state);
     expect(store.has(LIFE_KEY)).toBe(true);
     expect(store.has('ai-resident-settings')).toBe(false);
+  });
+
+  it('保存并读回领先的分钟数，旧存档默认 0', () => {
+    const state = createInitialLife({ seed: 42, atMinute: 12 * 60 });
+    saveLife('Qoduck', state, 3000);
+    expect(loadLife()?.aheadMinutes).toBe(3000);
+
+    store.set(LIFE_KEY, JSON.stringify({ version: 1, name: 'Qoduck', state }));
+    expect(loadLife()?.aheadMinutes).toBe(0);
+
+    store.set(
+      LIFE_KEY,
+      JSON.stringify({ version: 1, name: 'Qoduck', aheadMinutes: -1, state }),
+    );
+    expect(loadLife()).toBeNull();
   });
 
   it('事件 delta 允许负数，不会把正常存档误判为坏档', () => {
