@@ -138,11 +138,9 @@ The scene: Moganshan mountain in summer. An old stone stairway winds up a green 
 Avoid: smooth flat vector illustration, clean digital shapes, untextured fills, cold grey-green colors, giant foreground steps, a dense dark wall of bamboo, dappled light, sun rays, gradients, anime film background, photorealism, 3D rendering, thick cartoon outlines, saturated colors, text, watermark, borders, portrait orientation.
 ```
 
-**还是对不上时**：在同一个对话里只补一句，不要重写：
+**还是对不上时**：不要在出来的图上改（GPT 每次修改都会重画整张图，越改画风越偏）。新开对话，同样两步，只在第二条消息末尾加一句：
 - 太简单：`Add more of the small details from the reference: grass tufts, pebbles, small flowers, bark strokes and leaf clumps with inner outlines.`
 - 太细：`Fewer and larger leaf clumps, like the tree crowns in the reference.`
-
-这条不受「不要连环修改」的限制：「只补一句细节密度」不会让整体画风漂移。如果构图或颜色也变了，就新开对话。
 
 **这个方法也适合其他 5 张**：先让 GPT 描述画风，再生成。各地点的画面描述照用上面的，把第三版这段里「Match these specific things」那一块替换掉通用部分里的画风段落即可。
 
