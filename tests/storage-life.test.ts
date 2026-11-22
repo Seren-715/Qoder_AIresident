@@ -54,6 +54,24 @@ describe('生活存档', () => {
     expect(loadLife()?.state).toEqual(state);
   });
 
+  it('互动事件的结果和原因能读回', () => {
+    const state = createInitialLife({ seed: 7, atMinute: 12 * 60 });
+    state.events.push({
+      id: `${state.saveId}-e99`,
+      type: 'interact',
+      activityId: null,
+      activity: 'code',
+      atMinute: state.minute,
+      outcome: 'rejected',
+      message: '太困了，先睡一会儿',
+    });
+    saveLife('Qoduck', state);
+    expect(loadLife()?.state.events.at(-1)).toMatchObject({
+      outcome: 'rejected',
+      message: '太困了，先睡一会儿',
+    });
+  });
+
   it('名字去空白，超长回默认', () => {
     const state = createInitialLife({ seed: 1, atMinute: 12 * 60 });
     saveLife('  阿鸭  ', state);

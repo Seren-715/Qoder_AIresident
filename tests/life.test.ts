@@ -7,6 +7,7 @@ import {
   type LifeActivity,
   type LifeState,
 } from '../src/sim/life';
+import { isNight } from '../src/sim/time';
 
 const NOON = 12 * 60;
 const NIGHT_TIME = 23 * 60 + 30;
@@ -192,7 +193,7 @@ describe('生活模拟', () => {
     expect(interrupt?.delta?.energy).toBeCloseTo(-2.3, 5);
     expect(result.accepted).toBe(true);
     expect(result.state.activity?.kind).toBe('eat');
-    expect(result.state.events.some((e) => e.type === 'interact')).toBe(true);
+    expect(result.state.events.find((e) => e.type === 'interact')?.outcome).toBe('accepted');
   });
 
   it('条件不满足时不打断，只记互动并说明原因', () => {
@@ -208,7 +209,9 @@ describe('生活模拟', () => {
     expect(result.accepted).toBe(false);
     expect(result.message).toBe('现在还不困');
     expect(result.state.activity?.kind).toBe('gaze');
-    expect(result.state.events.some((e) => e.type === 'interact')).toBe(true);
+    const interact = result.state.events.find((e) => e.type === 'interact');
+    expect(interact?.outcome).toBe('rejected');
+    expect(interact?.message).toBe('现在还不困');
     expect(state.events.some((e) => e.type === 'interact')).toBe(false);
   });
 
@@ -225,6 +228,9 @@ describe('生活模拟', () => {
     expect(lowResult.accepted).toBe(false);
     expect(lowResult.message).toBe('呼……');
     expect(lowResult.state.activity?.kind).toBe('sleep');
+    const lowInteract = lowResult.state.events.find((e) => e.type === 'interact');
+    expect(lowInteract?.outcome).toBe('rejected');
+    expect(lowInteract?.message).toBe('呼……');
 
     const high = manualState(sleepActivity, {
       minute: 1380,
@@ -238,6 +244,52 @@ describe('生活模拟', () => {
       highResult.state.events.some((e) => e.type === 'interrupt' && e.activity === 'sleep'),
     ).toBe(true);
   });
+
+  it(
+    '6 颗种子 7 天的作息与心情统计达标',
+    () => {
+      for (const seed of [1, 2, 3, 4, 5, 6]) {
+        let state = createInitialLife({ seed, atMinute: 8 * 60 });
+        const end = state.minute + 7 * 24 * 60;
+        let nightSamples = 0;
+        let awakeAtNight = 0;
+        let lowFullness = 0;
+        let lowMood = 0;
+        let fullMood = 0;
+        let samples = 0;
+        let codeMinutes = 0;
+        let playMinutes = 0;
+        const moods: number[] = [];
+
+        while (state.minute < end) {
+          state = advance(state, state.minute + 1);
+          samples++;
+          moods.push(state.mood);
+
+          if (isNight(state.minute)) {
+            nightSamples++;
+            if (state.activity?.kind !== 'sleep') awakeAtNight++;
+          }
+          if (state.fullness < 30) lowFullness++;
+          if (state.mood < 30) lowMood++;
+          if (state.mood >= 99) fullMood++;
+          if (state.activity?.kind === 'code') codeMinutes++;
+          if (state.activity?.kind === 'play') playMinutes++;
+        }
+
+        moods.sort((a, b) => a - b);
+        const median = moods[Math.floor(moods.length / 2)];
+        expect(awakeAtNight / nightSamples, `seed ${seed} 夜里醒着`).toBeLessThan(0.15);
+        expect(lowFullness / samples, `seed ${seed} 饱腹<30`).toBeLessThan(0.1);
+        expect(median, `seed ${seed} 心情中位数`).toBeGreaterThanOrEqual(50);
+        expect(median, `seed ${seed} 心情中位数`).toBeLessThanOrEqual(80);
+        expect(lowMood / samples, `seed ${seed} 心情<30`).toBeLessThan(0.1);
+        expect(fullMood / samples, `seed ${seed} 心情>=99`).toBeLessThan(0.1);
+        expect(codeMinutes, `seed ${seed} 写代码时长`).toBeGreaterThan(playMinutes);
+      }
+    },
+    30000,
+  );
 
   it('7 天里写代码多于打滚，每天都有睡觉和吃饭', () => {
     const start = 8 * 60;

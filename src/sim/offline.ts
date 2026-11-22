@@ -39,6 +39,13 @@ const PHRASES: Record<ActivityId, (count: number) => string> = {
 
 const PHRASE_ORDER: ActivityId[] = ['sleep', 'eat', 'read', 'code', 'play', 'gaze'];
 
+function eventSeq(id: string, saveId: string): number | null {
+  const prefix = `${saveId}-e`;
+  if (!id.startsWith(prefix)) return null;
+  const seq = Number(id.slice(prefix.length));
+  return Number.isInteger(seq) ? seq : null;
+}
+
 function formatDuration(minutes: number): string {
   const total = Math.max(1, Math.round(minutes));
   if (total < 60) return `${total} 分钟`;
@@ -65,13 +72,14 @@ export function catchUpLife(saved: LifeState, nowMinute: number): CatchUpResult 
   const capped = nowMinute - saved.minute > MAX_CATCH_UP_MINUTES;
   const fromMinute = capped ? nowMinute - MAX_CATCH_UP_MINUTES : saved.minute;
   const base: LifeState = capped
-    ? { ...saved, minute: fromMinute, activity: null, events: [] }
+    ? { ...saved, minute: fromMinute, activity: null }
     : saved;
 
   const state = advance(base, nowMinute);
-  const events = state.events.filter(
-    (event) => event.atMinute >= fromMinute && event.atMinute <= nowMinute,
-  );
+  const events = state.events.filter((event) => {
+    const seq = eventSeq(event.id, saved.saveId);
+    return seq !== null && seq >= saved.nextEventSeq;
+  });
 
   return {
     state,

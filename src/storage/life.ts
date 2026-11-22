@@ -107,6 +107,20 @@ function parseEvent(value: unknown): LifeEvent | null {
     if (!delta) return null;
     event.delta = delta;
   }
+  if (value.outcome !== undefined) {
+    if (
+      value.outcome !== 'accepted' &&
+      value.outcome !== 'rejected' &&
+      value.outcome !== 'ignored'
+    ) {
+      return null;
+    }
+    event.outcome = value.outcome;
+  }
+  if (value.message !== undefined) {
+    if (typeof value.message !== 'string' || value.message.length > 80) return null;
+    event.message = value.message;
+  }
   return event;
 }
 

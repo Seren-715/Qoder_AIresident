@@ -6,6 +6,7 @@ import {
   LOW_STAT_THRESHOLD,
   MOOD,
   MOOD_TARGET,
+  NEED,
   NIGHT,
   REJECT_REASONS,
   START,
@@ -42,6 +43,8 @@ export interface LifeEvent {
   startedAtMinute?: number;
   endedAtMinute?: number;
   delta?: LifeStats;
+  outcome?: 'accepted' | 'rejected' | 'ignored';
+  message?: string;
 }
 
 export interface LifeState {
@@ -132,11 +135,11 @@ function isAvailable(kind: ActivityId, state: LifeState, atMinute: number): bool
 
 function needScore(kind: ActivityId, state: LifeState, atMinute: number): number {
   const need = ACTIVITIES[kind].need;
-  if (need === 'fullness') return 100 - state.fullness;
+  if (need === 'fullness') return 100 - state.fullness + NEED.eatBonus;
   if (need === 'energy') {
     return 100 - state.energy + (isNight(atMinute) ? NIGHT.sleepScoreBonus : 0);
   }
-  return 100 - state.mood + 20;
+  return Math.max(0, NEED.funBase - state.mood) + NEED.funBonus;
 }
 
 function chooseActivity(draft: LifeState, atMinute: number): ActivityId {
@@ -300,24 +303,37 @@ export function suggestActivity(
   atMinute: number,
 ): SuggestionResult {
   const draft = cloneState(advance(state, atMinute));
-  pushEvent(draft, {
-    type: 'interact',
-    activityId: draft.activity?.id ?? null,
-    activity: target,
-    atMinute,
-  });
+
+  function interact(
+    outcome: 'accepted' | 'rejected' | 'ignored',
+    message?: string,
+  ): void {
+    pushEvent(draft, {
+      type: 'interact',
+      activityId: draft.activity?.id ?? null,
+      activity: target,
+      atMinute,
+      outcome,
+      ...(message ? { message } : {}),
+    });
+  }
 
   if (draft.activity?.kind === target) {
+    interact('ignored');
     return { state: draft, accepted: false, message: null };
   }
 
   if (draft.activity?.kind === 'sleep') {
     if (draft.energy < NIGHT.wakeEnergy) {
+      interact('rejected', '呼……');
       return { state: draft, accepted: false, message: '呼……' };
     }
     if (!isAvailable(target, draft, atMinute)) {
-      return { state: draft, accepted: false, message: REJECT_REASONS[target] };
+      const message = REJECT_REASONS[target];
+      interact('rejected', message);
+      return { state: draft, accepted: false, message };
     }
+    interact('accepted');
     closeActivity(draft, 'interrupt', atMinute);
     const def = ACTIVITIES[target];
     const middle = Math.floor((def.minMinutes + def.maxMinutes) / 2);
@@ -326,9 +342,12 @@ export function suggestActivity(
   }
 
   if (!isAvailable(target, draft, atMinute)) {
-    return { state: draft, accepted: false, message: REJECT_REASONS[target] };
+    const message = REJECT_REASONS[target];
+    interact('rejected', message);
+    return { state: draft, accepted: false, message };
   }
 
+  interact('accepted');
   if (draft.activity) closeActivity(draft, 'interrupt', atMinute);
   const def = ACTIVITIES[target];
   const middle = Math.floor((def.minMinutes + def.maxMinutes) / 2);

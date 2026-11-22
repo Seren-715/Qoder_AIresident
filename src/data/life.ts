@@ -111,9 +111,15 @@ export const MOOD = {
 export const NIGHT = {
   startMinute: 23 * 60,
   endMinute: 7 * 60,
-  sleepScoreBonus: 40,
+  sleepScoreBonus: 70,
   sleepBelowEnergy: 70,
   wakeEnergy: 60,
+};
+
+export const NEED = {
+  eatBonus: 15,
+  funBase: 80,
+  funBonus: 20,
 };
 
 export const FORCE = {

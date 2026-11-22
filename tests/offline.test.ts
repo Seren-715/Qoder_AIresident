@@ -111,6 +111,38 @@ describe('离线补算', () => {
     expect(catchUpTarget(saved.minute, 0, 1000)).toBe(5000);
     expect(catchUpTarget(saved.minute, 600, 1000)).toBe(5000);
   });
+
+  it('存档时刻正好结束的活动不会重复计入补算', () => {
+    const saved = stateAt(1000);
+    saved.events = [
+      {
+        id: 'test-e1',
+        type: 'end',
+        activityId: 'old-a',
+        activity: 'code',
+        atMinute: 1000,
+        startedAtMinute: 940,
+        endedAtMinute: 1000,
+        delta: { fullness: -1, energy: -2, mood: 1 },
+      },
+    ];
+    saved.nextEventSeq = 2;
+
+    const result = catchUpLife(saved, 1010);
+    expect(result.events.some((e) => e.id === 'test-e1')).toBe(false);
+    expect(result.events.length).toBeGreaterThan(0);
+  });
+
+  it('封顶补算保留存档前的事件', () => {
+    const saved = stateAt(0);
+    saved.events = [endEvent('test-e1', 'read', 0)];
+    saved.nextEventSeq = 2;
+
+    const result = catchUpLife(saved, 30 * 24 * 60);
+    expect(result.capped).toBe(true);
+    expect(result.state.events.some((e) => e.id === 'test-e1')).toBe(true);
+    expect(result.events.some((e) => e.id === 'test-e1')).toBe(false);
+  });
 });
 
 describe('你不在的时候总结', () => {

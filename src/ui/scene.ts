@@ -45,11 +45,6 @@ export function mountScene(root: HTMLElement): void {
         </div>
       </div>
     </div>
-    <div class="away" role="status" aria-live="polite" hidden>
-      <strong>你不在的时候</strong>
-      <p class="away-body"></p>
-      <button type="button" class="away-close">知道啦</button>
-    </div>
     <div class="scene" role="group" aria-label="小黄鸭的树洞小屋">
       <img class="scene-bg" alt="" />
       <canvas class="water-canvas" aria-hidden="true"></canvas>
@@ -62,6 +57,11 @@ export function mountScene(root: HTMLElement): void {
       <div class="props props-front"></div>
       <button type="button" class="hotspot hotspot-door" aria-label="进入小屋"></button>
       <button type="button" class="hotspot hotspot-door-in" aria-label="走出小屋"></button>
+      <div class="away" role="status" aria-live="polite" hidden>
+        <strong>你不在的时候</strong>
+        <p class="away-body"></p>
+        <button type="button" class="away-close">知道啦</button>
+      </div>
     </div>
     <div class="controls">
       <div class="switch-group">
@@ -123,6 +123,7 @@ export function mountScene(root: HTMLElement): void {
   let name = DEFAULT_NAME;
   let life: LifeState;
   let awaySummary: AwaySummary | null = null;
+  let awaySummaryText: string | null = null;
   if (loaded) {
     name = loaded.name;
     const realNow = toGameMinute(Date.now());
@@ -130,6 +131,7 @@ export function mountScene(root: HTMLElement): void {
     const result = catchUpLife(loaded.state, target);
     life = result.state;
     awaySummary = summarizeAway(name, result);
+    awaySummaryText = awaySummary?.body ?? null;
   } else {
     life = createInitialLife({
       seed: newSeed(),
@@ -199,6 +201,7 @@ export function mountScene(root: HTMLElement): void {
     });
     clock = createClock(life.minute, Date.now());
     away.hidden = true;
+    awaySummaryText = null;
     for (const btn of speedButtons) {
       btn.setAttribute('aria-pressed', String(btn.dataset.speed === '1'));
     }
@@ -266,7 +269,9 @@ export function mountScene(root: HTMLElement): void {
     renderProps(propsBack, propsFront, currentScene, reducedMotion.matches);
     water.setReduced(reducedMotion.matches);
   });
-  const chat = mountChat({ getContext: () => buildChatContext(life, name) });
+  const chat = mountChat({
+    getContext: () => buildChatContext(life, name, awaySummaryText),
+  });
   mountSettings(sceneEl, { onRestart: restart });
   awayClose.addEventListener('click', () => {
     away.hidden = true;

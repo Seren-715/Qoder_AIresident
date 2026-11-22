@@ -71,29 +71,30 @@
 
 ### 6.1 契约 A：程序 → 模型
 
-一次请求只做一件事。上下文顺序固定：**人设 → 家规 → 现在 → 最近事件 → 检索记忆 → 本次任务 → 输出格式**。
+一次请求只做一件事。上下文顺序固定：**Function 人设/规则 → 现在 → 你不在的时候 → 最近事件 → 检索记忆 → 本次任务 → 输出格式**。
+
+人设和家规由 Function 持有，前端只送事实，不送 `persona` / `rules`，避免前端改写人设。当前的聊天只使用 `now`、`awaySummary`、`recent`；`memories` 与 `candidates` 留给之后的日记、旅行任务。
 
 ```ts
 type MindTask = 'chat' | 'journal' | 'decide' | 'postcard' | 'bubble';
 
 interface MindRequest {
   task: MindTask;
-  persona: string;          // 固定：Qoder 编程小鸭
-  rules: string[];          // 家规
   now: {
     atMinute: number;       // 整数游戏分钟
-    place: 'interior' | 'exterior';
-    activity: string;
+    timeLabel: string;      // 展示用，例如「11 月 22 日 19:56」
+    activity: string;       // 当前活动，例如「看书」
     fullness: number;
     energy: number;
     mood: number;
   };
-  recent: string[];         // 程序压缩过的最近事件，≤ 20 条
+  awaySummary?: string;     // 最近一次「你不在的时候」总结，≤ 120 字
+  recent: string[];         // 程序压缩过的最近事件，≤ 8 条；含完成、被打断和互动
   memories: {
     id: string;
     kind: 'diary' | 'about_you' | 'imported';
     text: string;
-  }[];                      // 检索到的，≤ 6 条
+  }[];                      // 检索到的，≤ 6 条（后续阶段）
   candidates?: { id: string; label: string; hint: string }[]; // 只有 decide 有
   input?: string;           // 只有 chat 有
 }

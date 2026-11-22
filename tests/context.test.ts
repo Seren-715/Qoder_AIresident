@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_RECENT_EVENTS, buildChatContext } from '../src/ai/context';
+import {
+  MAX_AWAY_SUMMARY,
+  MAX_RECENT_EVENTS,
+  buildChatContext,
+} from '../src/ai/context';
 import type { LifeEvent, LifeState } from '../src/sim/life';
 
 function stateWith(events: LifeEvent[], overrides: Partial<LifeState> = {}): LifeState {
@@ -26,21 +30,26 @@ function stateWith(events: LifeEvent[], overrides: Partial<LifeState> = {}): Lif
   };
 }
 
-function endEvent(id: string, atMinute: number, kind: 'read' | 'code' = 'read'): LifeEvent {
+function endEvent(
+  id: string,
+  atMinute: number,
+  kinds: 'read' | 'code' = 'read',
+  duration = 30,
+): LifeEvent {
   return {
     id,
     type: 'end',
     activityId: `a-${id}`,
-    activity: kind,
+    activity: kinds,
     atMinute,
-    startedAtMinute: atMinute - 30,
+    startedAtMinute: atMinute - duration,
     endedAtMinute: atMinute,
     delta: { fullness: -1, energy: -1, mood: 2 },
   };
 }
 
 describe('聊天上下文', () => {
-  it('只把完成和被打断的事件写成最近事实', () => {
+  it('把完成、被打断和互动事件写成最近事实', () => {
     const state = stateWith([
       {
         id: 'e-start',
@@ -56,6 +65,7 @@ describe('聊天上下文', () => {
         activityId: 'a-current',
         activity: 'read',
         atMinute: 12 * 60 + 5,
+        outcome: 'accepted',
       },
       {
         id: 'e-interrupt',
@@ -76,7 +86,51 @@ describe('聊天上下文', () => {
     expect(context.now.fullness).toBe(65);
     expect(context.now.energy).toBe(79);
     expect(context.now.mood).toBe(71);
-    expect(context.recent).toEqual(['12:00 看了 30 分钟书', '12:10 写代码被打断了']);
+    expect(context.recent).toEqual([
+      '12:00 看了 30 分钟书',
+      '12:05 你让我去看书',
+      '12:10 写代码被打断了',
+    ]);
+  });
+
+  it('被拒绝的互动会写明原因', () => {
+    const state = stateWith([
+      {
+        id: 'e-reject',
+        type: 'interact',
+        activityId: 'a-current',
+        activity: 'code',
+        atMinute: 12 * 60 + 5,
+        outcome: 'rejected',
+        message: '太困了，先睡一会儿',
+      },
+    ]);
+    const context = buildChatContext(state, 'Qoduck');
+    expect(context.recent[0]).toBe('12:05 你让我去写代码，我太困了，先睡一会儿');
+  });
+
+  it('超过 60 分钟写成小时和分钟', () => {
+    const state = stateWith([endEvent('e-code', 12 * 60 + 6, 'code', 66)]);
+    const context = buildChatContext(state, 'Qoduck');
+    expect(context.recent[0]).toBe('12:06 写了 1 小时 6 分钟代码');
+  });
+
+  it('昨天和更早的事件带上日期', () => {
+    const yesterday = stateWith([endEvent('e-read', 24 * 60 + 10 * 60, 'read', 60)], {
+      minute: 2 * 24 * 60 + 10 * 60,
+      activity: null,
+    });
+    expect(buildChatContext(yesterday, 'Qoduck').recent[0]).toBe(
+      '昨天 10:00 看了 1 小时书',
+    );
+
+    const older = stateWith([endEvent('e-read', 24 * 60 + 10 * 60, 'read', 60)], {
+      minute: 3 * 24 * 60 + 10 * 60,
+      activity: null,
+    });
+    expect(buildChatContext(older, 'Qoduck').recent[0]).toBe(
+      '1 月 2 日 10:00 看了 1 小时书',
+    );
   });
 
   it('最近事件只保留最近 8 条，顺序从旧到新', () => {
@@ -85,6 +139,16 @@ describe('聊天上下文', () => {
     expect(context.recent).toHaveLength(MAX_RECENT_EVENTS);
     expect(context.recent[0].startsWith('10:04')).toBe(true);
     expect(context.recent.at(-1)!.startsWith('10:11')).toBe(true);
+  });
+
+  it('带上「你不在的时候」总结并限长', () => {
+    const summary = '你不在的 3 小时里，Qoduck 看了一会儿书。现在它在窗边发呆。';
+    expect(buildChatContext(stateWith([]), 'Qoduck', summary).awaySummary).toBe(summary);
+
+    const long = buildChatContext(stateWith([]), 'Qoduck', 'x'.repeat(200));
+    expect(long.awaySummary).toHaveLength(MAX_AWAY_SUMMARY);
+
+    expect(buildChatContext(stateWith([]), 'Qoduck', '   ').awaySummary).toBeUndefined();
   });
 
   it('名字空白回默认，过长截断', () => {
