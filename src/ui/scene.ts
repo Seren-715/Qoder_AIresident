@@ -14,11 +14,19 @@ import {
 } from '../data/scene';
 import { DESTINATIONS } from '../data/travel';
 import { createClock, setClockSpeed, SPEEDS, tickClock, type GameClock, type Speed } from '../sim/clock';
-import { advance, createInitialLife, suggestActivity, type LifeState } from '../sim/life';
+import {
+  advance,
+  createInitialLife,
+  markTripRead,
+  suggestActivity,
+  suggestTravel,
+  type LifeState,
+} from '../sim/life';
 import { catchUpLife, catchUpTarget, summarizeAway, type AwaySummary } from '../sim/offline';
 import { formatClock, formatDateLabel, toGameMinute } from '../sim/time';
 import { clearLife, DEFAULT_NAME, loadLife, saveLife } from '../storage/life';
 import { mountChat } from './chat';
+import { mountPostcards } from './postcards';
 import { mountSettings } from './settings';
 import { renderProps, sceneBackground } from './props';
 import { mountWater, type WaterController } from './water';
@@ -49,6 +57,11 @@ export function mountScene(root: HTMLElement): void {
         <div class="props props-front"></div>
         <button type="button" class="hotspot hotspot-door" aria-label="进入小屋"><span class="hotspot-tag"></span></button>
         <button type="button" class="hotspot hotspot-door-in" aria-label="走出小屋"><span class="hotspot-tag"></span></button>
+        <button type="button" class="hotspot hotspot-photo-wall" aria-label="看看明信片"><span class="hotspot-tag">看看明信片</span></button>
+        <button type="button" class="hotspot hotspot-mailbox" aria-label="信箱"><span class="hotspot-tag">信箱</span><span class="mail-dot" hidden></span></button>
+        <button type="button" class="hotspot hotspot-signpost" aria-label="路牌"><span class="hotspot-tag">建议它出去走走</span></button>
+        <img class="road-duck" alt="" hidden />
+        <div class="travel-note" hidden><span class="travel-note-text"></span></div>
         <div class="chrome">
           <div class="note cal-note">
             <div class="cal-time">--:--</div>
@@ -67,7 +80,9 @@ export function mountScene(root: HTMLElement): void {
             <strong>你不在的时候</strong>
             <p class="away-body"></p>
             <button type="button" class="away-close">知道啦</button>
+            <button type="button" class="away-mail" hidden>去邮箱看看</button>
           </div>
+          <div class="sign-bubble" role="status" hidden></div>
         </div>
         <div class="intro" hidden>
           <div class="intro-sign" role="dialog" aria-label="小黄鸭的家">
@@ -86,6 +101,7 @@ export function mountScene(root: HTMLElement): void {
 
   const stageEl = root.querySelector<HTMLElement>('.stage')!;
   const sceneEl = root.querySelector<HTMLElement>('.scene')!;
+  const chromeEl = root.querySelector<HTMLElement>('.chrome')!;
   const bg = root.querySelector<HTMLImageElement>('.scene-bg')!;
   const waterCanvas = root.querySelector<HTMLCanvasElement>('.water-canvas')!;
   const propsBack = root.querySelector<HTMLElement>('.props-back')!;
@@ -116,6 +132,16 @@ export function mountScene(root: HTMLElement): void {
   const away = root.querySelector<HTMLElement>('.away')!;
   const awayBody = root.querySelector<HTMLElement>('.away-body')!;
   const awayClose = root.querySelector<HTMLButtonElement>('.away-close')!;
+  const awayMail = root.querySelector<HTMLButtonElement>('.away-mail')!;
+  const photoWall = root.querySelector<HTMLButtonElement>('.hotspot-photo-wall')!;
+  const mailbox = root.querySelector<HTMLButtonElement>('.hotspot-mailbox')!;
+  const mailDot = root.querySelector<HTMLElement>('.mail-dot')!;
+  const mailboxTag = mailbox.querySelector<HTMLElement>('.hotspot-tag')!;
+  const signpost = root.querySelector<HTMLButtonElement>('.hotspot-signpost')!;
+  const signBubble = root.querySelector<HTMLElement>('.sign-bubble')!;
+  const roadDuck = root.querySelector<HTMLImageElement>('.road-duck')!;
+  const travelNote = root.querySelector<HTMLElement>('.travel-note')!;
+  const travelNoteText = root.querySelector<HTMLElement>('.travel-note-text')!;
   const intro = root.querySelector<HTMLElement>('.intro')!;
   const introGo = root.querySelector<HTMLButtonElement>('.intro-go')!;
   const sideSlot = root.querySelector<HTMLElement>('.side-slot')!;
@@ -123,6 +149,7 @@ export function mountScene(root: HTMLElement): void {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let currentScene: SceneId = 'interior';
   let hintTimer: number | null = null;
+  let signTimer: number | null = null;
 
   function newSeed(): number {
     return (Math.random() * 0x100000000) >>> 0;
@@ -185,11 +212,62 @@ export function mountScene(root: HTMLElement): void {
     speedBtn.textContent = SPEED_LABELS[clock.speed];
   }
 
+  function updateBadges(): void {
+    const unread = life.trips.filter((trip) => !trip.read).length;
+    mailDot.hidden = unread === 0;
+    mailDot.textContent = String(unread);
+    mailboxTag.textContent = unread > 0 ? `信箱 · ${unread} 张新明信片` : '信箱';
+    awayMail.hidden = unread === 0;
+  }
+
+  function updateTravelUi(): void {
+    const activity = life.activity;
+    const traveling = activity?.kind === 'travel';
+    const destination =
+      activity?.kind === 'travel' && activity.destinationId
+        ? DESTINATIONS.find((d) => d.id === activity.destinationId)
+        : undefined;
+
+    travelNote.hidden = !(traveling && currentScene === 'interior');
+    if (traveling && activity) {
+      travelNoteText.textContent = `去${destination?.name ?? '远方'}了，大概 ${formatClock(
+        activity.endsAt,
+      )} 回来`;
+    }
+
+    const nearRoad =
+      activity?.kind === 'travel' &&
+      (life.minute - activity.startedAt <= 30 || activity.endsAt - life.minute <= 30);
+    roadDuck.hidden = !(nearRoad && currentScene === 'exterior');
+    if (!roadDuck.hidden) roadDuck.src = duckUrl('travel');
+  }
+
+  function showSignBubble(text: string): void {
+    signBubble.textContent = text;
+    signBubble.hidden = false;
+    if (signTimer !== null) window.clearTimeout(signTimer);
+    signTimer = window.setTimeout(() => {
+      signBubble.hidden = true;
+      signTimer = null;
+    }, 3500);
+  }
+
+  function suggestBySign(): void {
+    const result = suggestTravel(life, life.minute);
+    life = result.state;
+    renderLife();
+    const destination =
+      life.activity?.kind === 'travel' && life.activity.destinationId
+        ? DESTINATIONS.find((d) => d.id === life.activity!.destinationId)
+        : undefined;
+    showSignBubble(result.message ?? (destination ? `去${destination.name}啦` : '出门走走吧'));
+  }
+
   function renderLife(message: string | null = null): void {
     const activity = life.activity;
     if (activity?.kind === 'travel') {
       // 出门旅行中：屋里看不到鸭子，只留一个气泡。
-      setDuck(FURNITURE.door.anchor, 'sit', message ?? '旅行中');
+      setDuck(FURNITURE.door.anchor, 'sit', message ?? '');
       duckImg.style.display = 'none';
     } else {
       duckImg.style.display = '';
@@ -206,6 +284,8 @@ export function mountScene(root: HTMLElement): void {
       }
     }
     renderChrome();
+    updateTravelUi();
+    updateBadges();
   }
 
   function suggest(id: FurnitureId): void {
@@ -260,7 +340,7 @@ export function mountScene(root: HTMLElement): void {
   }
 
   function placeNotes(): void {
-    const parent = portraitQuery.matches ? sideSlot : sceneEl;
+    const parent = portraitQuery.matches ? sideSlot : chromeEl;
     if (calNote.parentElement !== parent) parent.appendChild(calNote);
     if (away.parentElement !== parent) parent.appendChild(away);
     stageEl.classList.toggle('is-portrait', portraitQuery.matches);
@@ -297,6 +377,19 @@ export function mountScene(root: HTMLElement): void {
   doorIn.querySelector('.hotspot-tag')!.textContent = SCENES.interior.doorSign;
   doorIn.addEventListener('click', () => show('exterior'));
 
+  photoWall.style.left = '70.5%';
+  photoWall.style.top = '32%';
+  photoWall.style.width = '16%';
+  photoWall.style.height = '20%';
+  mailbox.style.left = '63.8%';
+  mailbox.style.top = '45.5%';
+  mailbox.style.width = '6.4%';
+  mailbox.style.height = '15.5%';
+  signpost.style.left = '70.6%';
+  signpost.style.top = '44%';
+  signpost.style.width = '8.4%';
+  signpost.style.height = '16%';
+
   function show(id: SceneId): void {
     currentScene = id;
     bg.src = assetUrl(sceneBackground(id));
@@ -306,6 +399,9 @@ export function mountScene(root: HTMLElement): void {
     duckHit.style.display = id === 'interior' ? '' : 'none';
     door.style.display = id === 'exterior' ? '' : 'none';
     doorIn.style.display = id === 'interior' ? '' : 'none';
+    photoWall.style.display = id === 'interior' ? '' : 'none';
+    mailbox.style.display = id === 'exterior' ? '' : 'none';
+    signpost.style.display = id === 'exterior' ? '' : 'none';
     for (const btn of spotButtons) btn.style.display = id === 'interior' ? '' : 'none';
     renderLife();
   }
@@ -316,6 +412,25 @@ export function mountScene(root: HTMLElement): void {
   });
   helpBtn.addEventListener('click', showHints);
   mountSettings(sceneEl, { onRestart: restart, trigger: gearBtn });
+  const postcards = mountPostcards({
+    getTrips: () => life.trips,
+    getName: () => name,
+    onRead: (tripId) => {
+      const next = markTripRead(life, tripId);
+      if (next === life) return;
+      life = next;
+      persist();
+      updateBadges();
+    },
+  });
+  photoWall.addEventListener('click', () => postcards.openAlbum());
+  mailbox.addEventListener('click', () => postcards.openUnread());
+  signpost.addEventListener('click', suggestBySign);
+  awayMail.addEventListener('click', () => {
+    away.hidden = true;
+    show('exterior');
+    postcards.openUnread();
+  });
   reducedMotion.addEventListener('change', () => {
     renderProps(propsBack, propsFront, currentScene, reducedMotion.matches);
     water.setReduced(reducedMotion.matches);

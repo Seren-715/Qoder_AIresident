@@ -337,11 +337,11 @@ body {
 }
 
 .cal-note {
-  left: 2.2%;
-  top: 3.5%;
+  right: 11%;
+  top: 3%;
   width: 19%;
   padding: 0.7em 0.8em 0.6em;
-  transform: rotate(-2deg);
+  transform: rotate(2deg);
 }
 
 .cal-time {
@@ -878,6 +878,354 @@ body {
   outline-offset: 2px;
 }
 
+/* ---------- 旅行字条、背包鸭、路牌气泡、邮箱红点 ---------- */
+
+.bubble:empty {
+  display: none;
+}
+
+.travel-note {
+  position: absolute;
+  left: 73.5%;
+  top: 57%;
+  width: 15%;
+  padding: 0.55em 0.7em;
+  background: var(--paper);
+  border: 1.5px solid var(--paper-line);
+  border-radius: 4px;
+  box-shadow: 2px 3px 0 rgba(70, 40, 20, 0.25);
+  font-size: clamp(9px, 1.05vw, 13px);
+  line-height: 1.5;
+  color: var(--ink);
+  transform: rotate(2deg);
+  z-index: 8;
+  pointer-events: none;
+}
+
+.travel-note[hidden] {
+  display: none;
+}
+
+.travel-note::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--pin);
+  border: 1.5px solid #8a3020;
+  transform: translateX(-50%);
+}
+
+.road-duck {
+  position: absolute;
+  left: 80%;
+  top: 64%;
+  width: 10%;
+  transform: translate(-50%, -100%);
+  z-index: 4;
+  filter: drop-shadow(0 3px 3px rgba(80, 50, 20, 0.25));
+}
+
+.road-duck[hidden] {
+  display: none;
+}
+
+.sign-bubble {
+  position: absolute;
+  left: 75%;
+  top: 41%;
+  transform: translate(-50%, -100%);
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid #8a6a4c;
+  border-radius: 14px;
+  padding: 0.3em 0.75em;
+  font-size: clamp(10px, 1.15vw, 14px);
+  white-space: nowrap;
+  box-shadow: 0 2px 0 #8a6a4c;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sign-bubble[hidden] {
+  display: none;
+}
+
+.sign-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 10px;
+  height: 10px;
+  background: var(--paper);
+  border-right: 1.5px solid #8a6a4c;
+  border-bottom: 1.5px solid #8a6a4c;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.mail-dot {
+  position: absolute;
+  right: 8%;
+  top: 12%;
+  min-width: 1.5em;
+  height: 1.5em;
+  padding: 0 0.3em;
+  border-radius: 99px;
+  background: var(--pin);
+  border: 2px solid #fff;
+  color: #fff;
+  font-size: clamp(9px, 1vw, 12px);
+  font-weight: 700;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.mail-dot[hidden] {
+  display: none;
+}
+
+.away-mail {
+  display: inline-block;
+  margin-top: 0.45em;
+  margin-left: 0.4em;
+  font: inherit;
+  font-size: 0.9em;
+  padding: 0.15em 0.7em;
+  border: 1.5px solid var(--wood-dark);
+  border-radius: 99px;
+  background: var(--wood-light);
+  color: #fbe9c8;
+  cursor: pointer;
+}
+
+.away-mail[hidden] {
+  display: none;
+}
+
+/* ---------- 明信片与相册 ---------- */
+
+.postcards {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 18, 8, 0.5);
+  padding: 16px;
+}
+
+.postcards[hidden] {
+  display: none;
+}
+
+.postcard-card {
+  position: relative;
+  width: min(92vw, 660px);
+  max-height: min(92vh, 700px);
+  overflow-y: auto;
+  background: var(--paper);
+  border: 1.5px solid var(--paper-line);
+  border-radius: 12px;
+  padding: 16px 16px 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+}
+
+.postcard-close {
+  position: absolute;
+  right: 6px;
+  top: 4px;
+  z-index: 2;
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  padding: 6px 10px;
+}
+
+.postcard-single {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.postcard-single[hidden] {
+  display: none;
+}
+
+.postcard-image-wrap {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 5px solid #fffdf4;
+  box-shadow: 0 2px 0 rgba(70, 40, 20, 0.18);
+}
+
+.postcard-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.postcard-body {
+  position: relative;
+  padding: 0 0.3em;
+}
+
+.postmark {
+  float: right;
+  width: 78px;
+  height: 78px;
+  margin: 2px 0 8px 12px;
+  border-radius: 50%;
+  border: 2px dashed rgba(122, 74, 42, 0.6);
+  background: rgba(251, 243, 223, 0.85);
+  color: #8a5a36;
+  display: grid;
+  place-content: center;
+  gap: 2px;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.2;
+  transform: rotate(-8deg);
+}
+
+.postmark-name {
+  font-weight: 700;
+}
+
+.postcard-text {
+  font-size: clamp(13px, 1.5vw, 16px);
+  line-height: 1.9;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+
+.postcard-sign {
+  clear: both;
+  margin-top: 0.6em;
+  text-align: right;
+  color: var(--ink-soft);
+  font-size: clamp(12px, 1.3vw, 14px);
+}
+
+.album[hidden] {
+  display: none;
+}
+
+.album-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: clamp(14px, 1.6vw, 18px);
+}
+
+.album-count {
+  font-size: 0.8em;
+  color: var(--ink-soft);
+}
+
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.album-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  border: 1.5px solid var(--paper-line);
+  border-radius: 8px;
+  background: #fffdf4;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.album-item:hover {
+  border-color: #8a6a4c;
+}
+
+.album-item.is-unread {
+  box-shadow: 0 0 0 2px rgba(217, 87, 63, 0.35);
+}
+
+.album-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.album-name {
+  font-weight: 600;
+  font-size: clamp(12px, 1.3vw, 14px);
+}
+
+.album-date {
+  color: var(--ink-soft);
+  font-size: clamp(11px, 1.2vw, 12px);
+}
+
+.album-empty {
+  padding: 10px 2px;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.album-empty[hidden] {
+  display: none;
+}
+
+.postcard-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.postcard-actions button {
+  font: inherit;
+  font-size: clamp(12px, 1.3vw, 14px);
+  padding: 0.35em 1em;
+  border-radius: 99px;
+  border: 1.5px solid var(--wood-dark);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.postcard-actions button[hidden] {
+  display: none;
+}
+
+.postcard-next {
+  background: var(--wood-light);
+  color: #fbe9c8;
+}
+
+.postcard-actions button:focus-visible,
+.album-item:focus-visible,
+.postcard-close:focus-visible {
+  outline: 2px solid #ffd766;
+  outline-offset: 2px;
+}
+
 /* ---------- 竖屏手机 ---------- */
 
 .side-panel {
@@ -892,11 +1240,12 @@ body {
   .stage {
     flex-direction: column;
     align-items: stretch;
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .scene {
     width: 100vw;
+    flex: none;
     border-radius: 0;
     box-shadow: none;
   }
@@ -904,12 +1253,11 @@ body {
   .side-panel {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    flex: 1;
+    gap: 10px;
+    flex: 0 0 auto;
     width: 100%;
-    padding: 14px;
+    padding: 14px 14px 12px;
     background: #4e2e18;
-    overflow-y: auto;
   }
 
   .side-slot {
@@ -931,8 +1279,8 @@ body {
 
   .side-panel .rotate-hint {
     display: block;
-    margin-top: auto;
-    padding-top: 10px;
+    margin-top: 0;
+    padding-top: 2px;
     text-align: center;
     font-size: 12px;
     color: #c9ab82;
@@ -947,6 +1295,27 @@ body {
     width: 100%;
     max-height: 70vh;
     border-radius: 12px 12px 0 0;
+  }
+
+  .postcards {
+    padding: 8px;
+  }
+
+  .postcard-card {
+    width: 100%;
+    max-height: 96vh;
+    padding: 12px 12px 10px;
+  }
+
+  .postmark {
+    width: 66px;
+    height: 66px;
+    margin: 0 0 6px 10px;
+    font-size: 10px;
+  }
+
+  .album-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

@@ -1,4 +1,5 @@
 import { ACTIVITIES, type ActivityId } from '../data/life';
+import { DESTINATIONS } from '../data/travel';
 import type { LifeEvent, LifeState } from '../sim/life';
 import { DAY_MINUTES, formatGameTime, minuteOfDay } from '../sim/time';
 
@@ -14,6 +15,8 @@ export interface ChatContext {
   };
   awaySummary?: string;
   recent: string[];
+  /** 正在旅行时带上目的地和当地事实，聊天只许说这些。 */
+  travel?: { destination: string; facts: string[] };
 }
 
 export const MAX_RECENT_EVENTS = 8;
@@ -89,6 +92,10 @@ function describeEvent(event: LifeEvent, currentMinute: number): string {
     Math.floor(started / DAY_MINUTES) === Math.floor(ended / DAY_MINUTES)
       ? clockOf(ended)
       : eventTime(ended, currentMinute);
+  if (event.activity === 'travel' && event.destinationId) {
+    const destination = DESTINATIONS.find((d) => d.id === event.destinationId);
+    return `${startLabel}～${endLabel} 去${destination?.name ?? '远方'}旅行`;
+  }
   return `${startLabel}～${endLabel} ${DURATION_PHRASES[event.activity](
     durationText(ended - started),
   )}`;
@@ -116,17 +123,26 @@ export function buildChatContext(
   awaySummary?: string | null,
 ): ChatContext {
   const summary = awaySummary?.replace(/\s+/g, ' ').trim().slice(0, MAX_AWAY_SUMMARY);
+  const destination =
+    state.activity?.kind === 'travel' && state.activity.destinationId
+      ? DESTINATIONS.find((d) => d.id === state.activity!.destinationId)
+      : undefined;
   return {
     name: cleanName(name),
     now: {
       atMinute: state.minute,
       timeLabel: formatGameTime(state.minute),
-      activity: state.activity ? ACTIVITIES[state.activity.kind].label : '休息',
+      activity: destination
+        ? `在${destination.name}旅行`
+        : state.activity
+          ? ACTIVITIES[state.activity.kind].label
+          : '休息',
       fullness: Math.round(state.fullness),
       energy: Math.round(state.energy),
       mood: Math.round(state.mood),
     },
     ...(summary ? { awaySummary: summary } : {}),
     recent: recentEvents(state.events, state.minute),
+    ...(destination ? { travel: { destination: destination.name, facts: destination.facts } } : {}),
   };
 }

@@ -40,3 +40,11 @@ export function formatDateLabel(minute: number): string {
   const date = new Date(EPOCH_MS + minute * 60000 + 8 * 60 * 60 * 1000);
   return `${date.getUTCMonth() + 1} 月 ${date.getUTCDate()} 日 · ${WEEKDAYS[date.getUTCDay()]}`;
 }
+
+/** 邮戳上的短日期，例如「11.22」。 */
+export function formatShortDate(minute: number): string {
+  const date = new Date(EPOCH_MS + minute * 60000 + 8 * 60 * 60 * 1000);
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${month}.${day}`;
+}

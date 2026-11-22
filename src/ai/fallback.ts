@@ -38,6 +38,16 @@ function hash(message: string): number {
 
 function contextReply(message: string, context: ChatContext): string | null {
   const { now } = context;
+  const traveling = /^在(.+)旅行$/.exec(now.activity)?.[1];
+
+  if (traveling) {
+    if (/在干嘛|做什么|干什么|在做什么|忙什么|在吗/.test(message)) {
+      return `我在${traveling}呢，晚点回来讲给你听。`;
+    }
+    if (/旅行|出门|明信片|外面|好玩/.test(message)) {
+      return `我在${traveling}，路上看到好多东西，回去讲给你听。`;
+    }
+  }
 
   if (/在干嘛|做什么|干什么|在做什么|忙什么/.test(message)) {
     if (now.activity === '睡觉') return '呼……我在睡觉呢。';
@@ -88,5 +98,9 @@ export function pickFallback(message: string, context?: ChatContext): string {
   }
 
   const generic = GENERIC[code % GENERIC.length];
-  return context ? `我在${context.now.activity}。${generic}` : generic;
+  if (!context) return generic;
+  const activity = context.now.activity.startsWith('在')
+    ? context.now.activity
+    : `在${context.now.activity}`;
+  return `我${activity}。${generic}`;
 }

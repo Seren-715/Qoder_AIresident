@@ -327,6 +327,15 @@ function closeActivity(
   draft.activity = null;
 }
 
+/** 打开明信片后把对应的 Trip 标成已读；没变化时返回原状态。 */
+export function markTripRead(state: LifeState, tripId: string): LifeState {
+  const index = state.trips.findIndex((trip) => trip.id === tripId);
+  if (index < 0 || state.trips[index].read) return state;
+  const trips = state.trips.slice();
+  trips[index] = { ...trips[index], read: true };
+  return { ...state, trips };
+}
+
 export function createInitialLife(options: InitialLifeOptions): LifeState {
   const draft: LifeState = {
     saveId: options.saveId ?? 'life',

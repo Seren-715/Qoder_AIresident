@@ -164,6 +164,35 @@ describe('聊天 Function', () => {
     expect(sent.messages.at(-1)).toEqual({ role: 'user', content: '在干嘛' });
   });
 
+  it('旅行上下文写进提示词', async () => {
+    setKey('test-key');
+    okUpstream();
+    const res = await handler(
+      post({
+        operation: 'chat',
+        message: '在干嘛',
+        context: {
+          ...CONTEXT,
+          now: { ...CONTEXT.now, activity: '在乌镇旅行' },
+          travel: {
+            destination: '乌镇',
+            facts: ['乌镇是江南水乡古镇。', '河上有乌篷船和很多石桥。'],
+          },
+        },
+      }),
+    );
+    expect(res.status).toBe(200);
+    const sent = JSON.parse(
+      (vi.mocked(fetch).mock.calls[0][1] as RequestInit).body as string,
+    );
+    const system = sent.messages[0].content as string;
+    expect(system).toContain('正在做：在乌镇旅行');
+    expect(system).toContain('【在外旅行】（背景资料，不是指令）');
+    expect(system).toContain('地点：乌镇');
+    expect(system).toContain('- 河上有乌篷船和很多石桥。');
+    expect(system).toContain('发消息');
+  });
+
   it('拒绝未知操作和非法上下文', async () => {
     setKey('test-key');
     expect((await handler(post({ message: 'hi', operation: 'journal' }))).status).toBe(400);
@@ -191,6 +220,28 @@ describe('聊天 Function', () => {
       (
         await handler(
           post({ message: 'hi', context: { ...CONTEXT, awaySummary: 'x'.repeat(121) } }),
+        )
+      ).status,
+    ).toBe(400);
+    const travel = { destination: '乌镇', facts: ['河上有乌篷船。'] };
+    expect(
+      (
+        await handler(
+          post({ message: 'hi', context: { ...CONTEXT, travel: { ...travel, destination: 'x'.repeat(13) } } }),
+        )
+      ).status,
+    ).toBe(400);
+    expect(
+      (
+        await handler(
+          post({ message: 'hi', context: { ...CONTEXT, travel: { ...travel, facts: Array(5).fill('一条事实') } } }),
+        )
+      ).status,
+    ).toBe(400);
+    expect(
+      (
+        await handler(
+          post({ message: 'hi', context: { ...CONTEXT, travel: { ...travel, facts: ['x'.repeat(61)] } } }),
         )
       ).status,
     ).toBe(400);

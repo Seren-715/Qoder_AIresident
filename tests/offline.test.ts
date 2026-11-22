@@ -204,4 +204,28 @@ describe('你不在的时候总结', () => {
     const summary = summarizeAway('Qoduck', result)!;
     expect(summary.body).toContain('只补了最近 7 天');
   });
+
+  it('离场期间的旅行写成带回明信片', () => {
+    const travel = (id: string, destinationId: string, atMinute: number) => ({
+      ...endEvent(id, 'travel', atMinute),
+      destinationId,
+    });
+    const one: CatchUpResult = {
+      state: stateAt(1200),
+      fromMinute: 1000,
+      toMinute: 1200,
+      minutes: 200,
+      capped: false,
+      events: [travel('e-t1', 'wuzhen', 1100)],
+    };
+    const body = summarizeAway('Qoduck', one)?.body ?? '';
+    expect(body).toContain('还去了一趟乌镇，带回一张明信片');
+    expect(body).not.toContain('出了一趟远门');
+
+    const two: CatchUpResult = {
+      ...one,
+      events: [travel('e-t1', 'xihu', 1050), travel('e-t2', 'wuzhen', 1150)],
+    };
+    expect(summarizeAway('Qoduck', two)?.body).toContain('还去了西湖·断桥、乌镇，带回 2 张明信片');
+  });
 });

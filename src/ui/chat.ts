@@ -50,7 +50,10 @@ export function mountChat(options: ChatOptions): ChatPanel {
   }
 
   function refreshNow(context = options.getContext()): void {
-    nowLine.textContent = `${context.now.timeLabel} · 我在${context.now.activity}`;
+    const activity = context.now.activity.startsWith('在')
+      ? context.now.activity
+      : `在${context.now.activity}`;
+    nowLine.textContent = `${context.now.timeLabel} · 我${activity}`;
   }
 
   function close(): void {

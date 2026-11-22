@@ -1,4 +1,5 @@
 import { ACTIVITIES, type ActivityId } from '../data/life';
+import { DESTINATIONS } from '../data/travel';
 import { advance, type LifeEvent, type LifeState } from './life';
 
 export const MAX_CATCH_UP_MINUTES = 7 * 24 * 60;
@@ -96,15 +97,31 @@ export function summarizeAway(name: string, result: CatchUpResult): AwaySummary 
   if (result.minutes <= SUMMARY_THRESHOLD_MINUTES) return null;
 
   const counts = new Map<ActivityId, number>();
+  const travelNames: string[] = [];
   for (const event of result.events) {
     if (event.type !== 'end') continue;
     counts.set(event.activity, (counts.get(event.activity) ?? 0) + 1);
+    if (event.activity === 'travel' && event.destinationId) {
+      const destination = DESTINATIONS.find((d) => d.id === event.destinationId);
+      if (destination && !travelNames.includes(destination.name)) {
+        travelNames.push(destination.name);
+      }
+    }
   }
 
   const parts: string[] = [];
   for (const kind of PHRASE_ORDER) {
     const count = counts.get(kind) ?? 0;
-    if (count > 0) parts.push(PHRASES[kind](count));
+    if (count <= 0) continue;
+    if (kind === 'travel' && travelNames.length > 0) {
+      parts.push(
+        travelNames.length === 1
+          ? `还去了一趟${travelNames[0]}，带回一张明信片`
+          : `还去了${travelNames.join('、')}，带回 ${travelNames.length} 张明信片`,
+      );
+      continue;
+    }
+    parts.push(PHRASES[kind](count));
   }
 
   const duration = formatDuration(result.minutes);

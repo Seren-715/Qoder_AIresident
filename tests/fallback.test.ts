@@ -52,4 +52,10 @@ describe('模板兜底', () => {
   it('无关键词时也会接上当前活动', () => {
     expect(pickFallback('量子力学是什么', CONTEXT)).toContain('我在看书');
   });
+
+  it('旅行中像在路上发消息', () => {
+    const traveling = { ...CONTEXT, now: { ...CONTEXT.now, activity: '在乌镇旅行' } };
+    expect(pickFallback('你在干嘛', traveling)).toBe('我在乌镇呢，晚点回来讲给你听。');
+    expect(pickFallback('今天天气不错', traveling)).toContain('我在乌镇旅行');
+  });
 });

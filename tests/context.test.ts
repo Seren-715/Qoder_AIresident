@@ -164,4 +164,42 @@ describe('聊天上下文', () => {
     expect(context.now.activity).toBe('休息');
     expect(context.recent).toEqual([]);
   });
+
+  it('旅行中现在是在某地旅行，最近事件写目的地', () => {
+    const state = stateWith(
+      [
+        {
+          id: 'e-trip',
+          type: 'end',
+          activityId: 'a-trip',
+          activity: 'travel',
+          atMinute: 16 * 60 + 5,
+          startedAtMinute: 9 * 60 + 20,
+          endedAtMinute: 16 * 60 + 5,
+          delta: { fullness: 2, energy: -20, mood: 6 },
+          destinationId: 'wuzhen',
+        },
+      ],
+      {
+        minute: 17 * 60,
+        activity: {
+          id: 'a-now',
+          kind: 'travel',
+          startedAt: 16 * 60 + 30,
+          endsAt: 17 * 60 + 30,
+          statsAtStart: { fullness: 60, energy: 60, mood: 70 },
+          destinationId: 'wuzhen',
+        },
+      },
+    );
+    const context = buildChatContext(state, 'Qoduck');
+    expect(context.now.activity).toBe('在乌镇旅行');
+    expect(context.recent[0]).toBe('09:20～16:05 去乌镇旅行');
+    expect(context.travel?.destination).toBe('乌镇');
+    expect(context.travel?.facts).toHaveLength(3);
+  });
+
+  it('不在旅行时不带 travel 资料', () => {
+    expect(buildChatContext(stateWith([]), 'Qoduck').travel).toBeUndefined();
+  });
 });

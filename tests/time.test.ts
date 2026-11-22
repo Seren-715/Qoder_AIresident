@@ -3,6 +3,7 @@ import {
   formatClock,
   formatDateLabel,
   formatGameTime,
+  formatShortDate,
   isNight,
   minuteOfDay,
   toGameMinute,
@@ -38,5 +39,7 @@ describe('游戏时间', () => {
     expect(formatClock(24 * 60 + 5)).toBe('00:05');
     expect(formatDateLabel(0)).toBe('1 月 1 日 · 周四');
     expect(formatDateLabel(325 * 24 * 60 + 22 * 60 + 15)).toBe('11 月 22 日 · 周日');
+    expect(formatShortDate(0)).toBe('01.01');
+    expect(formatShortDate(325 * 24 * 60 + 22 * 60 + 15)).toBe('11.22');
   });
 });

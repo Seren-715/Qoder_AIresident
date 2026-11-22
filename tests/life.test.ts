@@ -3,9 +3,11 @@ import type { ActivityId } from '../src/data/life';
 import {
   advance,
   createInitialLife,
+  markTripRead,
   suggestActivity,
   type LifeActivity,
   type LifeState,
+  type Trip,
 } from '../src/sim/life';
 import { isNight } from '../src/sim/time';
 
@@ -310,5 +312,24 @@ describe('生活模拟', () => {
       expect(dayEnds.some((e) => e.activity === 'sleep')).toBe(true);
       expect(dayEnds.some((e) => e.activity === 'eat')).toBe(true);
     }
+  });
+
+  it('打开明信片只把对应的 Trip 标成已读', () => {
+    const trip = (id: string): Trip => ({
+      id,
+      destinationId: 'wuzhen',
+      departedAt: 9 * 60,
+      returnedAt: 16 * 60,
+      read: false,
+    });
+    const state = createInitialLife({ seed: 1, atMinute: 8 * 60 });
+    state.trips.push(trip('t1'), trip('t2'));
+
+    const after = markTripRead(state, 't2');
+    expect(after.trips.map((t) => t.read)).toEqual([false, true]);
+    expect(state.trips.map((t) => t.read)).toEqual([false, false]);
+
+    expect(markTripRead(after, 't2')).toBe(after);
+    expect(markTripRead(after, 'nope')).toBe(after);
   });
 });
