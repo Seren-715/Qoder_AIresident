@@ -82,7 +82,15 @@ function describeEvent(event: LifeEvent, currentMinute: number): string {
   if (ended === undefined || started === undefined || ended <= started) {
     return `${time} ${label}`;
   }
-  return `${time} ${DURATION_PHRASES[event.activity](durationText(ended - started))}`;
+
+  const startLabel = eventTime(started, currentMinute);
+  const endLabel =
+    Math.floor(started / DAY_MINUTES) === Math.floor(ended / DAY_MINUTES)
+      ? clockOf(ended)
+      : eventTime(ended, currentMinute);
+  return `${startLabel}～${endLabel} ${DURATION_PHRASES[event.activity](
+    durationText(ended - started),
+  )}`;
 }
 
 function recentEvents(events: LifeEvent[], currentMinute: number): string[] {

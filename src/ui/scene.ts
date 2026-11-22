@@ -45,18 +45,20 @@ export function mountScene(root: HTMLElement): void {
         </div>
       </div>
     </div>
-    <div class="scene" role="group" aria-label="小黄鸭的树洞小屋">
-      <img class="scene-bg" alt="" />
-      <canvas class="water-canvas" aria-hidden="true"></canvas>
-      <div class="props props-back"></div>
-      <div class="duck" role="button" tabindex="0" aria-label="和小黄鸭聊天">
-        <div class="bubble"></div>
-        <img class="duck-img" alt="小黄鸭" />
+    <div class="scene-wrap">
+      <div class="scene" role="group" aria-label="小黄鸭的树洞小屋">
+        <img class="scene-bg" alt="" />
+        <canvas class="water-canvas" aria-hidden="true"></canvas>
+        <div class="props props-back"></div>
+        <div class="duck" role="button" tabindex="0" aria-label="和小黄鸭聊天">
+          <div class="bubble"></div>
+          <img class="duck-img" alt="小黄鸭" />
+        </div>
+        <div class="duck-hit" aria-hidden="true"></div>
+        <div class="props props-front"></div>
+        <button type="button" class="hotspot hotspot-door" aria-label="进入小屋"></button>
+        <button type="button" class="hotspot hotspot-door-in" aria-label="走出小屋"></button>
       </div>
-      <div class="duck-hit" aria-hidden="true"></div>
-      <div class="props props-front"></div>
-      <button type="button" class="hotspot hotspot-door" aria-label="进入小屋"></button>
-      <button type="button" class="hotspot hotspot-door-in" aria-label="走出小屋"></button>
       <div class="away" role="status" aria-live="polite" hidden>
         <strong>你不在的时候</strong>
         <p class="away-body"></p>

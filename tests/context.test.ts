@@ -87,7 +87,7 @@ describe('聊天上下文', () => {
     expect(context.now.energy).toBe(79);
     expect(context.now.mood).toBe(71);
     expect(context.recent).toEqual([
-      '12:00 看了 30 分钟书',
+      '11:30～12:00 看了 30 分钟书',
       '12:05 你让我去看书',
       '12:10 写代码被打断了',
     ]);
@@ -112,7 +112,7 @@ describe('聊天上下文', () => {
   it('超过 60 分钟写成小时和分钟', () => {
     const state = stateWith([endEvent('e-code', 12 * 60 + 6, 'code', 66)]);
     const context = buildChatContext(state, 'Qoduck');
-    expect(context.recent[0]).toBe('12:06 写了 1 小时 6 分钟代码');
+    expect(context.recent[0]).toBe('11:00～12:06 写了 1 小时 6 分钟代码');
   });
 
   it('昨天和更早的事件带上日期', () => {
@@ -121,7 +121,7 @@ describe('聊天上下文', () => {
       activity: null,
     });
     expect(buildChatContext(yesterday, 'Qoduck').recent[0]).toBe(
-      '昨天 10:00 看了 1 小时书',
+      '昨天 09:00～10:00 看了 1 小时书',
     );
 
     const older = stateWith([endEvent('e-read', 24 * 60 + 10 * 60, 'read', 60)], {
@@ -129,7 +129,7 @@ describe('聊天上下文', () => {
       activity: null,
     });
     expect(buildChatContext(older, 'Qoduck').recent[0]).toBe(
-      '1 月 2 日 10:00 看了 1 小时书',
+      '1 月 2 日 09:00～10:00 看了 1 小时书',
     );
   });
 
@@ -137,8 +137,8 @@ describe('聊天上下文', () => {
     const events = Array.from({ length: 12 }, (_, i) => endEvent(`e${i}`, 10 * 60 + i));
     const context = buildChatContext(stateWith(events), 'Qoduck');
     expect(context.recent).toHaveLength(MAX_RECENT_EVENTS);
-    expect(context.recent[0].startsWith('10:04')).toBe(true);
-    expect(context.recent.at(-1)!.startsWith('10:11')).toBe(true);
+    expect(context.recent[0]).toContain('09:34～10:04');
+    expect(context.recent.at(-1)).toContain('09:41～10:11');
   });
 
   it('带上「你不在的时候」总结并限长', () => {

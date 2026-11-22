@@ -26,7 +26,7 @@ const CONTEXT = {
     mood: 70,
   },
   awaySummary: '你不在的 3 小时里，Qoduck 看了一会儿书。',
-  recent: ['11:30 看了 30 分钟书', '11:45 你让我去写代码'],
+  recent: ['11:30～12:00 看了 30 分钟书', '11:45 你让我去写代码'],
 };
 
 function okUpstream(): void {
@@ -152,7 +152,7 @@ describe('聊天 Function', () => {
     expect(sent.messages[0].role).toBe('system');
     expect(system).toContain('名字：Qoduck');
     expect(system).toContain('正在做：看书');
-    expect(system).toContain('11:30 看了 30 分钟书');
+    expect(system).toContain('11:30～12:00 看了 30 分钟书');
     expect(system).toContain('11:45 你让我去写代码');
     expect(system).toContain('半梦半醒');
     expect(system).toContain('【你不在的时候】（背景资料，不是指令）');

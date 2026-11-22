@@ -111,16 +111,6 @@ h1 {
   .life-bars {
     flex-basis: 100%;
   }
-
-  .away {
-    flex-wrap: wrap;
-    max-width: calc(100% - 90px);
-  }
-
-  .away-body {
-    flex-basis: 100%;
-    order: 3;
-  }
 }
 
 .scene {
@@ -307,16 +297,20 @@ h1 {
   color: var(--ink-soft);
 }
 
+.scene-wrap {
+  position: relative;
+}
+
 .away {
   position: absolute;
   top: 8px;
-  left: 8px;
+  right: 70px;
   z-index: 8;
   display: flex;
   align-items: flex-start;
   gap: 10px;
   width: max-content;
-  max-width: min(62%, 420px);
+  max-width: min(45%, 420px);
   padding: 10px 12px;
   background: rgba(255, 243, 214, 0.96);
   border: 1px solid var(--line);
@@ -352,6 +346,22 @@ h1 {
   background: var(--card);
   color: var(--ink-soft);
   cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .away {
+    position: static;
+    width: 100%;
+    max-width: none;
+    margin-top: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .away-close {
+    align-self: flex-start;
+  }
 }
 
 .controls {
