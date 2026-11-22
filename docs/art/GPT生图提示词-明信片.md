@@ -104,7 +104,47 @@ Colors: light and warm like the reference: pale sky, beige stone, sage and moss 
 Avoid: a dense wall of bamboo, a tunnel-like forest, hundreds of thin lines, individual leaves, dappled light spots, sun rays, gradients, dark or gloomy colors, detailed brick or stone texture, anime film background style, realistic painting, photorealism, 3D rendering, thick cartoon outlines, saturated colors, people, animals, text, watermark, borders, portrait orientation.
 ```
 
-**如果还是太细**：不要在原图上改，再新开一次，在场景描述最后加一句：`Even simpler: half as many objects, larger shapes.`
+### 5（第三版）`moganshan` 莫干山：第二版又简化过头
+
+**第二版的问题**：从太细跳到了太简单，变成了扁平的矢量插画，和屋外全景对不上。
+
+| 偏在哪 | 屋外全景是什么样 | 第三版怎么写 |
+|---|---|---|
+| 树冠是一整块光滑的绿色 | 树冠由很多小的扇贝形叶团叠成，叶团里面有描边，下层叶团颜色深一档 | 逐条描述参考图的画法，要求照着画 |
+| 没有纹理，像矢量图 | 树皮有短线笔触，草地边缘有一簇簇草，地上有小石子和小花，整张有纸张颗粒 | 要求「中等细节」，并列出这些小东西 |
+| 颜色偏冷偏灰 | 偏暖的黄绿和橄榄绿，整体带一点暖黄的纸色 | 写明暖黄绿、暖纸色 |
+| 台阶巨大、占满前景 | 略高的斜侧视角，主体在中景，小路蜿蜒到远处 | 改成和参考图一样的视角，石阶在中景蜿蜒向上 |
+
+问题出在第二版只写了「简单」，没写清楚「像参考图那样的简单」。第三版不再用「简单」「复杂」这类词，而是**逐条描述参考图里的具体画法**。
+
+**生成方法**：新开对话，上传 `room-exterior.webp`。
+
+1. 第一条消息先只发：`Describe the art style of this image in detail: outlines, how trees and grass are drawn, level of detail, texture and colors.` 让 GPT 先把画风说出来，后面生成时更容易对齐。
+2. 第二条消息贴下面这段。
+
+```
+Now please generate a LANDSCAPE image with a 3:2 aspect ratio, drawn by the same artist in exactly the style you just described, as if it were another location in the same game world. It must look like it belongs right next to the uploaded image.
+
+Match these specific things from the reference:
+- Tree crowns and bamboo foliage are built from many small overlapping scalloped leaf clumps, each clump with its own thin dark brown outline; lower clumps are one flat shade darker. Not one smooth blob, and not individual realistic leaves.
+- Thin dark brown outlines of even weight, slightly wobbly, hand-drawn.
+- Medium detail, the same density as the reference: short line strokes for bark and stone texture, small tufts of grass along every edge, a few scattered pebbles and tiny wildflowers (white, coral and mustard), small cracks on the steps.
+- Flat colors with one darker flat shade, no gradients, with visible paper grain over everything.
+- The same warm palette: yellowish greens and olive greens, warm beige ground, warm brown wood and stone, muted dusty blue water and sky, cream clouds, a warm yellowish paper tone overall.
+- The same slightly elevated three-quarter view, with the main subject in the middle ground and a path winding into the distance, like the dirt road in the reference.
+
+The scene: Moganshan mountain in summer. An old stone stairway winds up a green hillside from the lower left toward a small old stone villa with a red-tiled roof and a wooden balcony in the middle ground, right of center. Beside the lower part of the stairs, a small clear stream with one little waterfall over a few mossy rocks, flowing into a small pool at the bottom right. Clumps of bamboo frame the left and right sides (tall segmented stalks with clumped leaves drawn as described), with other round leafy trees behind them. Background: layered soft hills and a pale blue sky with a few cream clouds. No characters, no people, no animals, no ducks. No text, no signs.
+
+Avoid: smooth flat vector illustration, clean digital shapes, untextured fills, cold grey-green colors, giant foreground steps, a dense dark wall of bamboo, dappled light, sun rays, gradients, anime film background, photorealism, 3D rendering, thick cartoon outlines, saturated colors, text, watermark, borders, portrait orientation.
+```
+
+**还是对不上时**：在同一个对话里只补一句，不要重写：
+- 太简单：`Add more of the small details from the reference: grass tufts, pebbles, small flowers, bark strokes and leaf clumps with inner outlines.`
+- 太细：`Fewer and larger leaf clumps, like the tree crowns in the reference.`
+
+这条不受「不要连环修改」的限制：「只补一句细节密度」不会让整体画风漂移。如果构图或颜色也变了，就新开对话。
+
+**这个方法也适合其他 5 张**：先让 GPT 描述画风，再生成。各地点的画面描述照用上面的，把第三版这段里「Match these specific things」那一块替换掉通用部分里的画风段落即可。
 
 **另外**：`yunqi` 云栖小镇的画面也有竹林，生成时如果也出现一整面密竹，按这里同样的方法改：竹子只画几丛，叶子画成成团的扁平色块，上方留出天空。
 
