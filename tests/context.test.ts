@@ -26,6 +26,7 @@ function stateWith(events: LifeEvent[], overrides: Partial<LifeState> = {}): Lif
     nextActivitySeq: 2,
     nextEventSeq: 10,
     events,
+    trips: [],
     ...overrides,
   };
 }

@@ -29,6 +29,7 @@ const DURATION_PHRASES: Record<ActivityId, (duration: string) => string> = {
   code: (duration) => `写了 ${duration}代码`,
   play: (duration) => `打了 ${duration}滚`,
   gaze: (duration) => `发了 ${duration}呆`,
+  travel: (duration) => `旅行了 ${duration}`,
 };
 
 function cleanName(name: string): string {

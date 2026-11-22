@@ -13,8 +13,18 @@ import {
   TRAIT,
   type ActivityId,
 } from '../data/life';
+import { TRAVEL } from '../data/travel';
 import { nextRandom } from './rng';
-import { isNight } from './time';
+import { DAY_MINUTES, isNight } from './time';
+import {
+  autoDepartureBlock,
+  chooseDestination,
+  minutesUntilReturnDeadline,
+  pickTravelMinutes,
+  suggestDepartureBlock,
+  TRAVEL_AWAY_MESSAGE,
+  type TravelMemory,
+} from './travel';
 
 const MAX_EVENTS = 200;
 
@@ -30,6 +40,17 @@ export interface LifeActivity {
   startedAt: number;
   endsAt: number;
   statsAtStart: LifeStats;
+  /** 只有 travel 有，指向目的地 id。 */
+  destinationId?: string;
+}
+
+export interface Trip {
+  /** 等于这次旅行的 activityId。 */
+  id: string;
+  destinationId: string;
+  departedAt: number;
+  returnedAt: number;
+  read: boolean;
 }
 
 export type LifeEventType = 'start' | 'end' | 'interrupt' | 'interact';
@@ -45,6 +66,8 @@ export interface LifeEvent {
   delta?: LifeStats;
   outcome?: 'accepted' | 'rejected' | 'ignored';
   message?: string;
+  /** 只有 travel 有，指向目的地 id。 */
+  destinationId?: string;
 }
 
 export interface LifeState {
@@ -60,6 +83,8 @@ export interface LifeState {
   nextActivitySeq: number;
   nextEventSeq: number;
   events: LifeEvent[];
+  /** 只追加的旅行记录，最多保留 TRAVEL.maxTrips 条。 */
+  trips: Trip[];
 }
 
 export interface InitialLifeOptions {
@@ -96,6 +121,7 @@ function cloneState(state: LifeState): LifeState {
       ? { ...state.activity, statsAtStart: { ...state.activity.statsAtStart } }
       : null,
     events: state.events.slice(),
+    trips: state.trips.slice(),
   };
 }
 
@@ -116,6 +142,20 @@ function pushEvent(draft: LifeState, event: Omit<LifeEvent, 'id'>): void {
   }
 }
 
+function lastReturnedAt(state: LifeState): number | null {
+  const last = state.trips[state.trips.length - 1];
+  return last ? last.returnedAt : null;
+}
+
+function travelMemory(state: LifeState): TravelMemory {
+  return {
+    visited: state.trips.map((trip) => trip.destinationId),
+    lastDestinationId: state.trips.length
+      ? state.trips[state.trips.length - 1].destinationId
+      : null,
+  };
+}
+
 function isAvailable(kind: ActivityId, state: LifeState, atMinute: number): boolean {
   switch (kind) {
     case 'sleep':
@@ -130,10 +170,18 @@ function isAvailable(kind: ActivityId, state: LifeState, atMinute: number): bool
       return state.energy >= AVAILABLE.playEnergyAtLeast;
     case 'gaze':
       return true;
+    case 'travel':
+      return autoDepartureBlock({
+        atMinute,
+        energy: state.energy,
+        fullness: state.fullness,
+        lastReturnedAt: lastReturnedAt(state),
+      }) === null;
   }
 }
 
 function needScore(kind: ActivityId, state: LifeState, atMinute: number): number {
+  if (kind === 'travel') return TRAVEL.needScore;
   const need = ACTIVITIES[kind].need;
   if (need === 'fullness') return 100 - state.fullness + NEED.eatBonus;
   if (need === 'energy') {
@@ -172,6 +220,7 @@ function startActivity(
   kind: ActivityId,
   atMinute: number,
   durationMinutes: number,
+  destinationId?: string,
 ): void {
   const id = `${draft.saveId}-a${draft.nextActivitySeq++}`;
   draft.activity = {
@@ -180,6 +229,7 @@ function startActivity(
     startedAt: atMinute,
     endsAt: atMinute + durationMinutes,
     statsAtStart: statsOf(draft),
+    ...(destinationId ? { destinationId } : {}),
   };
   if (ACTIVITIES[kind].entertainment) draft.lastFun = kind;
   pushEvent(draft, {
@@ -187,11 +237,18 @@ function startActivity(
     activityId: id,
     activity: kind,
     atMinute,
+    ...(destinationId ? { destinationId } : {}),
   });
 }
 
 function startNextActivity(draft: LifeState, atMinute: number): void {
   const kind = chooseActivity(draft, atMinute);
+  if (kind === 'travel') {
+    const destination = chooseDestination(travelMemory(draft), () => random(draft));
+    const minutes = pickTravelMinutes(destination, () => random(draft));
+    startActivity(draft, 'travel', atMinute, minutes, destination.id);
+    return;
+  }
   const def = ACTIVITIES[kind];
   startActivity(draft, kind, atMinute, randomInt(draft, def.minMinutes, def.maxMinutes));
 }
@@ -253,7 +310,20 @@ function closeActivity(
       energy: round1(now.energy - activity.statsAtStart.energy),
       mood: round1(now.mood - activity.statsAtStart.mood),
     },
+    ...(activity.destinationId ? { destinationId: activity.destinationId } : {}),
   });
+  if (type === 'end' && activity.kind === 'travel' && activity.destinationId) {
+    draft.trips.push({
+      id: activity.id,
+      destinationId: activity.destinationId,
+      departedAt: activity.startedAt,
+      returnedAt: atMinute,
+      read: false,
+    });
+    if (draft.trips.length > TRAVEL.maxTrips) {
+      draft.trips.splice(0, draft.trips.length - TRAVEL.maxTrips);
+    }
+  }
   draft.activity = null;
 }
 
@@ -271,6 +341,7 @@ export function createInitialLife(options: InitialLifeOptions): LifeState {
     nextActivitySeq: 1,
     nextEventSeq: 1,
     events: [],
+    trips: [],
   };
   startNextActivity(draft, draft.minute);
   return draft;
@@ -318,6 +389,11 @@ export function suggestActivity(
     });
   }
 
+  if (draft.activity?.kind === 'travel') {
+    interact('rejected', TRAVEL_AWAY_MESSAGE);
+    return { state: draft, accepted: false, message: TRAVEL_AWAY_MESSAGE };
+  }
+
   if (draft.activity?.kind === target) {
     interact('ignored');
     return { state: draft, accepted: false, message: null };
@@ -352,5 +428,59 @@ export function suggestActivity(
   const def = ACTIVITIES[target];
   const middle = Math.floor((def.minMinutes + def.maxMinutes) / 2);
   startActivity(draft, target, atMinute, randomInt(draft, def.minMinutes, middle));
+  return { state: draft, accepted: true, message: null };
+}
+
+/**
+ * 点屋外的路牌：建议它出去走走。
+ * 条件满足就出发，否则说明原因。旅行中不可被打断。
+ */
+export function suggestTravel(state: LifeState, atMinute: number): SuggestionResult {
+  const draft = cloneState(advance(state, atMinute));
+
+  function interact(
+    outcome: 'accepted' | 'rejected' | 'ignored',
+    message?: string,
+  ): void {
+    pushEvent(draft, {
+      type: 'interact',
+      activityId: draft.activity?.id ?? null,
+      activity: 'travel',
+      atMinute,
+      outcome,
+      ...(message ? { message } : {}),
+      ...(draft.activity?.destinationId
+        ? { destinationId: draft.activity.destinationId }
+        : {}),
+    });
+  }
+
+  if (draft.activity?.kind === 'travel') {
+    interact('rejected', TRAVEL_AWAY_MESSAGE);
+    return { state: draft, accepted: false, message: TRAVEL_AWAY_MESSAGE };
+  }
+
+  const day = Math.floor(atMinute / DAY_MINUTES);
+  const departedToday = draft.trips.some(
+    (trip) => Math.floor(trip.departedAt / DAY_MINUTES) === day,
+  );
+  const block = suggestDepartureBlock({
+    atMinute,
+    energy: draft.energy,
+    fullness: draft.fullness,
+    departedToday,
+  });
+  if (block) {
+    interact('rejected', block);
+    return { state: draft, accepted: false, message: block };
+  }
+
+  const destination = chooseDestination(travelMemory(draft), () => random(draft));
+  const wanted = pickTravelMinutes(destination, () => random(draft));
+  const minutes = Math.max(1, Math.min(wanted, minutesUntilReturnDeadline(atMinute)));
+
+  interact('accepted');
+  if (draft.activity) closeActivity(draft, 'interrupt', atMinute);
+  startActivity(draft, 'travel', atMinute, minutes, destination.id);
   return { state: draft, accepted: true, message: null };
 }

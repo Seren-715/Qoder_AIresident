@@ -1,10 +1,12 @@
 import { ACTIVITIES, type ActivityId } from '../data/life';
+import { isDestinationId, TRAVEL } from '../data/travel';
 import type {
   LifeActivity,
   LifeEvent,
   LifeEventType,
   LifeState,
   LifeStats,
+  Trip,
 } from '../sim/life';
 
 export const LIFE_KEY = 'ai-resident-life';
@@ -12,6 +14,7 @@ export const DEFAULT_NAME = 'Qoduck';
 const VERSION = 1;
 const MAX_NAME = 20;
 const MAX_EVENTS = 200;
+const MAX_TRIPS = TRAVEL.maxTrips;
 const ACTIVITY_IDS = new Set<string>(Object.keys(ACTIVITIES));
 const EVENT_TYPES = new Set<string>(['start', 'end', 'interrupt', 'interact']);
 
@@ -70,12 +73,33 @@ function parseActivity(value: unknown): LifeActivity | null {
   if (value.endsAt <= value.startedAt) return null;
   const statsAtStart = parseStats(value.statsAtStart);
   if (!statsAtStart) return null;
+  const hasDestination = value.destinationId !== undefined;
+  if (hasDestination && !isDestinationId(value.destinationId)) return null;
+  if (value.kind === 'travel' && !hasDestination) return null;
   return {
     id: value.id,
     kind: value.kind,
     startedAt: value.startedAt,
     endsAt: value.endsAt,
     statsAtStart,
+    ...(hasDestination ? { destinationId: value.destinationId as string } : {}),
+  };
+}
+
+function parseTrip(value: unknown): Trip | null {
+  if (!isRecord(value)) return null;
+  if (typeof value.id !== 'string' || !value.id) return null;
+  if (!isDestinationId(value.destinationId)) return null;
+  if (!isInteger(value.departedAt, 0, Number.MAX_SAFE_INTEGER)) return null;
+  if (!isInteger(value.returnedAt, 0, Number.MAX_SAFE_INTEGER)) return null;
+  if (value.returnedAt < value.departedAt) return null;
+  if (typeof value.read !== 'boolean') return null;
+  return {
+    id: value.id,
+    destinationId: value.destinationId,
+    departedAt: value.departedAt,
+    returnedAt: value.returnedAt,
+    read: value.read,
   };
 }
 
@@ -121,6 +145,10 @@ function parseEvent(value: unknown): LifeEvent | null {
     if (typeof value.message !== 'string' || value.message.length > 80) return null;
     event.message = value.message;
   }
+  if (value.destinationId !== undefined) {
+    if (!isDestinationId(value.destinationId)) return null;
+    event.destinationId = value.destinationId;
+  }
   return event;
 }
 
@@ -156,6 +184,19 @@ function parseState(value: unknown): LifeState | null {
     events.push(event);
   }
 
+  // 旧存档没有 trips，按空数组读入，不因此重新开局。
+  let trips: Trip[] = [];
+  if (value.trips !== undefined) {
+    if (!Array.isArray(value.trips)) return null;
+    const parsed: Trip[] = [];
+    for (const item of value.trips) {
+      const trip = parseTrip(item);
+      if (!trip) return null;
+      parsed.push(trip);
+    }
+    trips = parsed.slice(-MAX_TRIPS);
+  }
+
   return {
     saveId: value.saveId,
     seed: value.seed,
@@ -169,6 +210,7 @@ function parseState(value: unknown): LifeState | null {
     nextActivitySeq: value.nextActivitySeq,
     nextEventSeq: value.nextEventSeq,
     events,
+    trips,
   };
 }
 

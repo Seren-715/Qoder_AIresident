@@ -2,11 +2,19 @@ import type { FurnitureId } from './scene';
 
 export type StatKey = 'fullness' | 'energy' | 'mood';
 
-export type ActivityId = 'sleep' | 'eat' | 'read' | 'code' | 'gaze' | 'play';
+export type ActivityId =
+  | 'sleep'
+  | 'eat'
+  | 'read'
+  | 'code'
+  | 'gaze'
+  | 'play'
+  | 'travel';
 
 export interface ActivityDef {
   id: ActivityId;
-  furniture: FurnitureId;
+  /** 旅行时鸭子不在屋里，没有家具。 */
+  furniture?: FurnitureId;
   label: string;
   minMinutes: number;
   maxMinutes: number;
@@ -76,6 +84,15 @@ export const ACTIVITIES: Record<ActivityId, ActivityDef> = {
     entertainment: true,
     need: 'mood',
   },
+  travel: {
+    id: 'travel',
+    label: '旅行',
+    // 时长由目的地决定，这里只留一个整体范围。
+    minMinutes: 180,
+    maxMinutes: 540,
+    effects: { energy: -20, fullness: 30 },
+    need: 'mood',
+  },
 };
 
 export const START: Record<StatKey, number> = {
@@ -98,6 +115,7 @@ export const MOOD_TARGET: Record<ActivityId, number> = {
   code: 82,
   gaze: 68,
   play: 76,
+  travel: 85,
 };
 
 export const MOOD = {
@@ -142,6 +160,7 @@ export const TRAIT: Record<ActivityId, number> = {
   gaze: 1.0,
   play: 1.2,
   sleep: 0.9,
+  travel: 1.0,
 };
 
 export const REJECT_REASONS: Record<ActivityId, string> = {
@@ -151,6 +170,7 @@ export const REJECT_REASONS: Record<ActivityId, string> = {
   code: '太困了，先睡一会儿',
   gaze: '已经在这儿发呆啦',
   play: '没力气打滚了',
+  travel: '现在不能出门',
 };
 
 const FURNITURE_ACTIVITY: Partial<Record<FurnitureId, ActivityId>> = {

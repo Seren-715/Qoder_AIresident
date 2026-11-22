@@ -34,6 +34,7 @@ function manualState(activity: LifeActivity, overrides: Partial<LifeState> = {})
         atMinute: activity.startedAt,
       },
     ],
+    trips: [],
     ...overrides,
   };
 }

@@ -35,9 +35,10 @@ const PHRASES: Record<ActivityId, (count: number) => string> = {
   code: (count) => (count === 1 ? '写了一会儿代码' : `写了 ${count} 次代码`),
   play: (count) => (count === 1 ? '打了一会儿滚' : `打了 ${count} 次滚`),
   gaze: (count) => (count === 1 ? '发了一会儿呆' : `发了 ${count} 次呆`),
+  travel: (count) => (count === 1 ? '出了一趟远门' : `出了 ${count} 趟远门`),
 };
 
-const PHRASE_ORDER: ActivityId[] = ['sleep', 'eat', 'read', 'code', 'play', 'gaze'];
+const PHRASE_ORDER: ActivityId[] = ['sleep', 'eat', 'read', 'code', 'play', 'gaze', 'travel'];
 
 function eventSeq(id: string, saveId: string): number | null {
   const prefix = `${saveId}-e`;

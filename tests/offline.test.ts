@@ -28,6 +28,7 @@ function stateAt(minute: number, activity: LifeActivity | null = null): LifeStat
     nextActivitySeq: 2,
     nextEventSeq: 2,
     events: [],
+    trips: [],
   };
 }
 

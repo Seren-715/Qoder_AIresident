@@ -38,6 +38,43 @@ describe('生活存档', () => {
     expect(loadLife()).toBeNull();
   });
 
+  it('旧存档没有 trips 时按空数组读入，不重新开局', () => {
+    const state = createInitialLife({ seed: 5, atMinute: 12 * 60 });
+    const legacy = { ...state } as Record<string, unknown>;
+    delete legacy.trips;
+    store.set(LIFE_KEY, JSON.stringify({ version: 1, name: 'Qoduck', state: legacy }));
+
+    const save = loadLife();
+    expect(save).not.toBeNull();
+    expect(save?.state.trips).toEqual([]);
+    expect(save?.state.minute).toBe(state.minute);
+    expect(save?.state.events.length).toBe(state.events.length);
+  });
+
+  it(' trips 里有坏记录时按坏档处理', () => {
+    const state = createInitialLife({ seed: 5, atMinute: 12 * 60 });
+    store.set(
+      LIFE_KEY,
+      JSON.stringify({
+        version: 1,
+        name: 'Qoduck',
+        state: {
+          ...state,
+          trips: [
+            {
+              id: 't1',
+              destinationId: 'nowhere',
+              departedAt: 100,
+              returnedAt: 200,
+              read: false,
+            },
+          ],
+        },
+      }),
+    );
+    expect(loadLife()).toBeNull();
+  });
+
   it('事件 delta 允许负数，不会把正常存档误判为坏档', () => {
     const state = createInitialLife({ seed: 3, atMinute: 12 * 60 });
     state.events.push({

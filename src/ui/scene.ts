@@ -155,15 +155,23 @@ export function mountScene(root: HTMLElement): void {
 
   function renderLife(message: string | null = null): void {
     const activity = life.activity;
-    if (activity) {
-      const spot = FURNITURE[ACTIVITIES[activity.kind].furniture];
-      if (spot.action) setDuck(spot.anchor, spot.action.pose, message ?? spot.action.bubble);
+    if (activity?.kind === 'travel') {
+      // 出门旅行中：屋里看不到鸭子，只留一个气泡。
+      setDuck(FURNITURE.door.anchor, 'sit', message ?? '旅行中');
+      duckImg.style.display = 'none';
     } else {
-      setDuck(
-        FURNITURE[IDLE_SPOT.furniture].anchor,
-        IDLE_SPOT.pose,
-        message ?? IDLE_SPOT.bubble,
-      );
+      duckImg.style.display = '';
+      const furniture = activity ? ACTIVITIES[activity.kind].furniture : undefined;
+      const spot = furniture ? FURNITURE[furniture] : undefined;
+      if (spot?.action) {
+        setDuck(spot.anchor, spot.action.pose, message ?? spot.action.bubble);
+      } else {
+        setDuck(
+          FURNITURE[IDLE_SPOT.furniture].anchor,
+          IDLE_SPOT.pose,
+          message ?? IDLE_SPOT.bubble,
+        );
+      }
     }
     lifeTime.textContent = formatGameTime(life.minute);
     const stats = { fullness: life.fullness, energy: life.energy, mood: life.mood };
