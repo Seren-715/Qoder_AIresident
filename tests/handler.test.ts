@@ -1,11 +1,21 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { handler } from '../functions/handler';
+import { handler, resetRateLimitForTest } from '../functions/handler';
 
-function post(body: unknown): Request {
+function post(body: unknown, headers: Record<string, string> = {}): Request {
   return new Request('http://local/functions/v1/app', {
     method: 'POST',
     body: JSON.stringify(body),
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...headers },
+  });
+}
+
+const HTTPS_URL = 'https://ai-resident-test.qoder.zone/functions/v1/app';
+
+function httpsPost(body: unknown, headers: Record<string, string> = {}): Request {
+  return new Request(HTTPS_URL, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: { 'Content-Type': 'application/json', ...headers },
   });
 }
 
@@ -43,6 +53,7 @@ function okUpstream(): void {
 afterEach(() => {
   vi.unstubAllGlobals();
   delete (globalThis as Record<string, unknown>).Deno;
+  resetRateLimitForTest();
 });
 
 describe('聊天 Function', () => {
@@ -102,42 +113,91 @@ describe('聊天 Function', () => {
     expect(await res.json()).toEqual({ ok: false, code: 'upstream_unavailable' });
   });
 
-  it('拒绝不可信接口地址，Secret 不外发', async () => {
+  it('忽略调用方传入的接口地址与模型，仍用服务端默认值', async () => {
     setKey('test-key');
-    const res = await handler(
-      post({ message: 'hi', config: { baseUrl: 'https://evil.example.com', model: 'x' } }),
-    );
-    expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ ok: false, code: 'invalid_input' });
+    okUpstream();
+    for (const config of [
+      { baseUrl: 'https://evil.example.com', model: 'x' },
+      { baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1/', model: 'qwen-plus' },
+      { model: 'x'.repeat(65) },
+    ]) {
+      vi.mocked(fetch).mockClear();
+      const res = await handler(post({ message: 'hi', config }));
+      expect(res.status).toBe(200);
+      const call = vi.mocked(fetch).mock.calls[0];
+      expect(String(call[0])).toBe('https://api.deepseek.com/chat/completions');
+      expect(JSON.parse((call[1] as RequestInit).body as string).model).toBe('deepseek-chat');
+    }
   });
 
-  it('可信地址与模型随请求生效', async () => {
+  it('线上跨站或缺失 Origin 返回 403', async () => {
     setKey('test-key');
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () =>
-        new Response(JSON.stringify({ choices: [{ message: { content: '嘎' } }] }), {
-          headers: { 'Content-Type': 'application/json' },
-        }),
-      ),
-    );
-    const res = await handler(
-      post({
-        message: 'hi',
-        config: { baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1/', model: 'qwen-plus' },
-      }),
-    );
-    expect(res.status).toBe(200);
-    const call = vi.mocked(fetch).mock.calls[0];
-    expect(String(call[0])).toBe('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions');
-    expect(JSON.parse((call[1] as RequestInit).body as string).model).toBe('qwen-plus');
+    const missing = await handler(httpsPost({ message: 'hi' }));
+    expect(missing.status).toBe(403);
+    expect(await missing.json()).toEqual({ ok: false, code: 'forbidden_origin' });
+
+    expect(
+      (await handler(httpsPost({ message: 'hi' }, { Origin: 'https://evil.example.com' }))).status,
+    ).toBe(403);
+    expect(
+      (
+        await handler(
+          httpsPost({ message: 'hi' }, { Origin: 'https://ai-resident-test.qoder.zone.evil.com' }),
+        )
+      ).status,
+    ).toBe(403);
   });
 
-  it('拒绝超长模型名', async () => {
+  it('同源或 *.qoder.zone 放行', async () => {
     setKey('test-key');
-    const res = await handler(post({ message: 'hi', config: { model: 'x'.repeat(65) } }));
-    expect(res.status).toBe(400);
+    okUpstream();
+    expect(
+      (
+        await handler(
+          httpsPost({ message: 'hi' }, { Origin: 'https://ai-resident-test.qoder.zone' }),
+        )
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await handler(
+          httpsPost({ message: 'hi' }, {
+            Referer: 'https://ai-resident-test.qoder.zone/index.html',
+          }),
+        )
+      ).status,
+    ).toBe(200);
+    expect(
+      (await handler(httpsPost({ message: 'hi' }, { Origin: 'https://foo.qoder.zone' }))).status,
+    ).toBe(200);
   });
+
+  it('单 IP 十分钟内最多 15 次', async () => {
+    setKey('test-key');
+    okUpstream();
+    const headers = { 'x-forwarded-for': '203.0.113.9, 10.0.0.1' };
+    for (let i = 0; i < 15; i++) {
+      expect((await handler(post({ message: 'hi' }, headers))).status).toBe(200);
+    }
+    const blocked = await handler(post({ message: 'hi' }, headers));
+    expect(blocked.status).toBe(429);
+    expect(await blocked.json()).toEqual({ ok: false, code: 'rate_limited' });
+  });
+
+  it('单实例每日最多 300 次', async () => {
+    setKey('test-key');
+    okUpstream();
+    for (let i = 0; i < 300; i++) {
+      const ip = `10.1.${Math.floor(i / 15)}.${i % 15}`;
+      const res = await handler(post({ message: 'hi' }, { 'x-forwarded-for': ip }));
+      expect(res.status, `第 ${i + 1} 次`).toBe(200);
+    }
+    const blocked = await handler(
+      post({ message: 'hi' }, { 'x-forwarded-for': '198.51.100.77' }),
+    );
+    expect(blocked.status).toBe(429);
+    expect(await blocked.json()).toEqual({ ok: false, code: 'rate_limited' });
+  }, 30000);
 
   it('把上下文写进系统提示词，用户消息保持独立', async () => {
     setKey('test-key');

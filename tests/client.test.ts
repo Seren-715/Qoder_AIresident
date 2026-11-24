@@ -75,6 +75,16 @@ describe('聊天客户端', () => {
     expect(body.context).toEqual(CONTEXT);
   });
 
+  it('429 限流时静默走模板', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => jsonResponse({ ok: false, code: 'rate_limited' }, 429)),
+    );
+    const result = await sendChat('你好', []);
+    expect(result.fallback).toBe(true);
+    expect(result.reply).toBe(pickFallback('你好'));
+  });
+
   it('失败时用带上下文的模板兜底', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('offline'); }));
     const result = await sendChat('在干嘛', [], undefined, CONTEXT);
@@ -97,6 +107,14 @@ describe('明信片客户端', () => {
   it('成功时返回模型文案', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => jsonResponse({ ok: true, text: '乌篷船摇得很稳。' })));
     expect(await sendPostcard(TRIP)).toBe('乌篷船摇得很稳。');
+  });
+
+  it('429 限流时静默返回 null（保留模板）', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => jsonResponse({ ok: false, code: 'rate_limited' }, 429)),
+    );
+    expect(await sendPostcard(TRIP)).toBeNull();
   });
 
   it('拒答、坏 payload、网络失败都静默返回 null', async () => {

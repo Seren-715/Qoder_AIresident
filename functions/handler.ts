@@ -10,7 +10,6 @@ const BEHAVIOR_RULES = [
 
 const MAX_MESSAGE = 500;
 const MAX_HISTORY = 12;
-const MAX_MODEL = 64;
 const MAX_CONTEXT_NAME = 20;
 const MAX_CONTEXT_RECENT = 8;
 const MAX_CONTEXT_LINE = 80;
@@ -28,7 +27,11 @@ const MAX_POSTCARD_LABEL = 32;
 const MAX_TRIP_HOURS = 24 * 7;
 const MAX_POSTCARD_CHARS = 100;
 const UPSTREAM_TIMEOUT_MS = 15000;
-const TRUSTED_HOSTS = ['api.deepseek.com', 'dashscope.aliyuncs.com'];
+const DEFAULT_BASE_URL = 'https://api.deepseek.com';
+const DEFAULT_MODEL = 'deepseek-chat';
+const RATE_WINDOW_MS = 10 * 60 * 1000;
+const RATE_PER_IP = 15;
+const RATE_PER_DAY = 300;
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -241,32 +244,6 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-function parseConfig(value: unknown): { baseUrl?: string; model?: string } | null {
-  if (!value || typeof value !== 'object') return null;
-  const config = value as Record<string, unknown>;
-  let baseUrl: string | undefined;
-  let model: string | undefined;
-  if (config.baseUrl !== undefined) {
-    if (typeof config.baseUrl !== 'string') return null;
-    let parsed: URL;
-    try {
-      parsed = new URL(config.baseUrl);
-    } catch {
-      return null;
-    }
-    // The Secret key must never be sent to a caller-chosen untrusted host.
-    if (parsed.protocol !== 'https:' || !TRUSTED_HOSTS.includes(parsed.hostname)) return null;
-    baseUrl = config.baseUrl.replace(/\/+$/, '');
-  }
-  if (config.model !== undefined) {
-    if (typeof config.model !== 'string' || !config.model.trim() || config.model.length > MAX_MODEL) {
-      return null;
-    }
-    model = config.model.trim();
-  }
-  return { baseUrl, model };
-}
-
 function parsePostcardTrip(value: unknown): PostcardTrip | null {
   if (!isRecord(value)) return null;
   const destination = cleanText(value.destination);
@@ -302,21 +279,77 @@ function parsePostcardTrip(value: unknown): PostcardTrip | null {
   return { destination, region, facts, departedLabel, returnedLabel, hours };
 }
 
+const ipWindows = new Map<string, number[]>();
+let dailyLimit = { dateKey: '', count: 0 };
+
+/** 仅测试用：清空内存里的限流状态，避免用例互相污染。 */
+export function resetRateLimitForTest(): void {
+  ipWindows.clear();
+  dailyLimit = { dateKey: '', count: 0 };
+}
+
+function clientIp(request: Request): string {
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) {
+    const first = forwarded.split(',')[0]?.trim();
+    if (first) return first;
+  }
+  return request.headers.get('x-real-ip')?.trim() || 'unknown';
+}
+
+function utcDateKey(now: number): string {
+  return new Date(now).toISOString().slice(0, 10);
+}
+
+/** 单 IP 十分钟滑动窗口 15 次 + 单实例每日 300 次。 */
+function allowRequest(request: Request): boolean {
+  const now = Date.now();
+  const ip = clientIp(request);
+  const hits = (ipWindows.get(ip) ?? []).filter((at) => now - at < RATE_WINDOW_MS);
+  ipWindows.set(ip, hits);
+  if (hits.length >= RATE_PER_IP) return false;
+
+  const key = utcDateKey(now);
+  if (dailyLimit.dateKey !== key) dailyLimit = { dateKey: key, count: 0 };
+  if (dailyLimit.count >= RATE_PER_DAY) return false;
+
+  hits.push(now);
+  dailyLimit.count += 1;
+  if (ipWindows.size > 1000) {
+    for (const [otherIp, stamps] of ipWindows) {
+      if (stamps.length === 0) ipWindows.delete(otherIp);
+    }
+  }
+  return true;
+}
+
+/** 线上只接受同源页面或 *.qoder.zone 发起的请求；本地 http 不拦截。 */
+function isOriginAllowed(request: Request): boolean {
+  const url = new URL(request.url);
+  if (url.protocol !== 'https:') return true;
+  const candidate = request.headers.get('origin') ?? request.headers.get('referer');
+  if (!candidate) return false;
+  let parsed: URL;
+  try {
+    parsed = new URL(candidate);
+  } catch {
+    return false;
+  }
+  if (parsed.origin === url.origin) return true;
+  return parsed.hostname.endsWith('.qoder.zone');
+}
+
 type ParsedRequest =
   | {
       operation: 'chat';
       message: string;
       history: ChatMessage[];
       context?: ChatContextPayload;
-      baseUrl?: string;
-      model?: string;
     }
   | {
       operation: 'postcard';
       trip: PostcardTrip;
       context?: ChatContextPayload;
-      baseUrl?: string;
-      model?: string;
     };
 
 function parseInput(data: unknown): ParsedRequest | null {
@@ -325,9 +358,7 @@ function parseInput(data: unknown): ParsedRequest | null {
   const operation = body.operation === undefined ? 'chat' : body.operation;
   if (operation !== 'chat' && operation !== 'postcard') return null;
 
-  const config = body.config === undefined ? {} : parseConfig(body.config);
-  if (!config) return null;
-
+  // 公开版忽略调用方传来的 config（baseUrl / model），只认服务端环境变量。
   let context: ChatContextPayload | undefined;
   if (body.context !== undefined) {
     const parsed = parseContext(body.context);
@@ -338,7 +369,7 @@ function parseInput(data: unknown): ParsedRequest | null {
   if (operation === 'postcard') {
     const trip = parsePostcardTrip(body.trip);
     if (!trip) return null;
-    return { operation: 'postcard', trip, context, ...config };
+    return { operation: 'postcard', trip, context };
   }
 
   if (typeof body.message !== 'string') return null;
@@ -356,12 +387,15 @@ function parseInput(data: unknown): ParsedRequest | null {
     }
   }
 
-  return { operation: 'chat', message, history, context, ...config };
+  return { operation: 'chat', message, history, context };
 }
 
 export async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') {
     return json({ ok: false, code: 'method_not_allowed' }, 405);
+  }
+  if (!isOriginAllowed(request)) {
+    return json({ ok: false, code: 'forbidden_origin' }, 403);
   }
   let data: unknown;
   try {
@@ -371,15 +405,13 @@ export async function handler(request: Request): Promise<Response> {
   }
   const input = parseInput(data);
   if (!input) return json({ ok: false, code: 'invalid_input' }, 400);
+  if (!allowRequest(request)) return json({ ok: false, code: 'rate_limited' }, 429);
 
   const env = (globalThis as { Deno?: { env: { get(name: string): string | undefined } } }).Deno?.env;
   const apiKey = env?.get('LLM_API_KEY');
   if (!apiKey) return json({ ok: false, code: 'service_not_configured' }, 503);
-  const base = (input.baseUrl || env?.get('LLM_BASE_URL') || 'https://api.deepseek.com').replace(
-    /\/+$/,
-    '',
-  );
-  const model = input.model || env?.get('LLM_MODEL') || 'deepseek-chat';
+  const base = (env?.get('LLM_BASE_URL') || DEFAULT_BASE_URL).replace(/\/+$/, '');
+  const model = env?.get('LLM_MODEL') || DEFAULT_MODEL;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
