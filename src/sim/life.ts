@@ -356,6 +356,64 @@ export function createInitialLife(options: InitialLifeOptions): LifeState {
   return draft;
 }
 
+/**
+ * 新档先过完最近 24 小时：自然生活里没有旅行时，用同一套建议逻辑在上午补一次，
+ * 让第一次打开就有最近事件和一张未读明信片。
+ */
+export function createStarterLife(options: InitialLifeOptions): LifeState {
+  const atMinute = options.atMinute;
+  const start = atMinute - DAY_MINUTES;
+  const spawn = (): LifeState => createInitialLife({ ...options, atMinute: start });
+
+  const natural = advance(spawn(), atMinute);
+  if (natural.trips.length > 0) return natural;
+
+  for (const departure of starterDepartures(start, atMinute)) {
+    const draft = advance(spawn(), departure);
+    if (draft.activity?.kind === 'travel') continue;
+    const suggestion = suggestTravel(draft, departure);
+    if (!suggestion.accepted) continue;
+    const finished = advance(suggestion.state, atMinute);
+    if (finished.trips.length > 0) return finished;
+  }
+
+  // 出发条件（饱腹/体力）偶尔一整天都没满足：用同一套旅行机制补一次，
+  // 时长截到 atMinute 前回来，保证新档里有一条真实完成的旅行记录。
+  for (const departure of starterDepartures(start, atMinute)) {
+    const draft = advance(spawn(), departure);
+    if (draft.activity?.kind === 'travel') continue;
+    if (startStarterTrip(draft, departure, atMinute)) return advance(draft, atMinute);
+  }
+  return natural;
+}
+
+function startStarterTrip(draft: LifeState, departure: number, atMinute: number): boolean {
+  const room = atMinute - departure - 60;
+  if (room < 60) return false;
+  const destination = chooseDestination(travelMemory(draft), () => random(draft));
+  const minutes = Math.min(pickTravelMinutes(destination, () => random(draft)), room);
+  if (draft.activity) closeActivity(draft, 'interrupt', departure);
+  startActivity(draft, 'travel', departure, minutes, destination.id);
+  return true;
+}
+
+/** 优先昨天上午 09:30，再按远近尝试窗口内其它上午时段。 */
+function starterDepartures(start: number, atMinute: number): number[] {
+  const times: number[] = [];
+  const first = start + 30;
+  const last = atMinute - 180;
+  const dayStart = Math.floor(start / DAY_MINUTES) * DAY_MINUTES;
+  for (let day = 0; day <= 1; day++) {
+    const base = dayStart + day * DAY_MINUTES;
+    for (let t = base + TRAVEL.departStartMinute; t <= base + TRAVEL.suggestEndMinute; t += 30) {
+      if (t >= first && t <= last) times.push(t);
+    }
+  }
+  const morning = dayStart + 9 * 60 + 30;
+  const target = morning >= first ? morning : morning + DAY_MINUTES;
+  return times.sort((a, b) => Math.abs(a - target) - Math.abs(b - target) || a - b);
+}
+
 export function advance(state: LifeState, toMinute: number): LifeState {
   if (!Number.isFinite(toMinute) || toMinute <= state.minute) return state;
 

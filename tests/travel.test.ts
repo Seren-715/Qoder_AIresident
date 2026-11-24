@@ -153,7 +153,7 @@ describe('出发的条件', () => {
     const base = { atMinute: MORNING, energy: 80, fullness: 80, departedToday: false };
     expect(suggestDepartureBlock(base)).toBeNull();
     expect(suggestDepartureBlock({ ...base, atMinute: 14 * 60 + 1 })).toBe(
-      '天快黑了，明天再去吧',
+      '天快黑啦，点右上角 ×600 到明早再去吧',
     );
     expect(suggestDepartureBlock({ ...base, energy: 59 })).toBe('太累了，先歇会儿');
     expect(suggestDepartureBlock({ ...base, fullness: 59 })).toBe('肚子饿，先吃饭');
@@ -264,7 +264,7 @@ describe('路牌建议', () => {
 
     const late = suggestTravel(idleState({ minute: 14 * 60 + 1 }), 14 * 60 + 1);
     expect(late.accepted).toBe(false);
-    expect(late.message).toBe('天快黑了，明天再去吧');
+    expect(late.message).toBe('天快黑啦，点右上角 ×600 到明早再去吧');
   });
 
   it('条件不满足时说明原因', () => {

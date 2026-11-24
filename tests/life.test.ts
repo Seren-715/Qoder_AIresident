@@ -3,13 +3,14 @@ import type { ActivityId } from '../src/data/life';
 import {
   advance,
   createInitialLife,
+  createStarterLife,
   markTripRead,
   suggestActivity,
   type LifeActivity,
   type LifeState,
   type Trip,
 } from '../src/sim/life';
-import { isNight } from '../src/sim/time';
+import { DAY_MINUTES, isNight } from '../src/sim/time';
 
 const NOON = 12 * 60;
 const NIGHT_TIME = 23 * 60 + 30;
@@ -331,5 +332,38 @@ describe('生活模拟', () => {
 
     expect(markTripRead(after, 't2')).toBe(after);
     expect(markTripRead(after, 'nope')).toBe(after);
+  });
+});
+
+describe('新档自带昨天的一段生活', () => {
+  it('白天、深夜、多颗种子开局都有旅行和未读明信片', () => {
+    for (const seed of [1, 2, 3, 7]) {
+      for (const atMinute of [
+        DAY_MINUTES + 15 * 60,
+        DAY_MINUTES + 3 * 60,
+        DAY_MINUTES + 23 * 60 + 45,
+      ]) {
+        const state = createStarterLife({ seed, atMinute });
+        const label = `seed ${seed} @${atMinute}`;
+        expect(state.minute, label).toBe(atMinute);
+        expect(state.trips.length, label).toBeGreaterThanOrEqual(1);
+        expect(state.trips.some((trip) => !trip.read), label).toBe(true);
+        expect(state.events.length, label).toBeGreaterThan(0);
+        for (const value of [state.fullness, state.energy, state.mood]) {
+          expect(value).toBeGreaterThanOrEqual(0);
+          expect(value).toBeLessThanOrEqual(100);
+        }
+      }
+    }
+  });
+
+  it('旅行记录有完整的出发与返回，事件里也有对应结束', () => {
+    const state = createStarterLife({ seed: 5, atMinute: 325 * DAY_MINUTES + 14 * 60 });
+    const trip = state.trips[0];
+    expect(trip.returnedAt).toBeGreaterThan(trip.departedAt);
+    expect(
+      state.events.some((event) => event.type === 'end' && event.destinationId === trip.destinationId),
+    ).toBe(true);
+    expect(state.trips.every((item) => item.read === false)).toBe(true);
   });
 });

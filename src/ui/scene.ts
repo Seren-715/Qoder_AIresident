@@ -16,7 +16,7 @@ import { DESTINATIONS } from '../data/travel';
 import { createClock, setClockSpeed, SPEEDS, tickClock, type GameClock, type Speed } from '../sim/clock';
 import {
   advance,
-  createInitialLife,
+  createStarterLife,
   markTripRead,
   suggestActivity,
   suggestTravel,
@@ -175,7 +175,7 @@ export function mountScene(root: HTMLElement): void {
     awaySummary = summarizeAway(name, result);
     awaySummaryText = awaySummary?.body ?? null;
   } else {
-    life = createInitialLife({
+    life = createStarterLife({
       seed: newSeed(),
       atMinute: toGameMinute(Date.now()),
       saveId: newSaveId(),
@@ -318,7 +318,7 @@ export function mountScene(root: HTMLElement): void {
     clearLife();
     clearPostcards();
     name = DEFAULT_NAME;
-    life = createInitialLife({
+    life = createStarterLife({
       seed: newSeed(),
       atMinute: toGameMinute(Date.now()),
       saveId: newSaveId(),

@@ -75,7 +75,7 @@ export interface SuggestDepartureInput {
 export function suggestDepartureBlock(input: SuggestDepartureInput): string | null {
   const now = minuteOfDay(input.atMinute);
   if (now < TRAVEL.departStartMinute || now > TRAVEL.suggestEndMinute) {
-    return '天快黑了，明天再去吧';
+    return '天快黑啦，点右上角 ×600 到明早再去吧';
   }
   if (input.energy < TRAVEL.energyAtLeast) return '太累了，先歇会儿';
   if (input.fullness < TRAVEL.fullnessAtLeast) return '肚子饿，先吃饭';

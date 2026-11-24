@@ -659,6 +659,36 @@ body {
   border: 1px solid var(--paper-line);
 }
 
+.chat-suggest {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45em;
+  padding: 0.2em 0.9em 0.5em;
+}
+
+.chat-suggest[hidden] {
+  display: none;
+}
+
+.chat-suggest-btn {
+  max-width: 100%;
+  font: inherit;
+  font-size: clamp(11px, 1.2vw, 13px);
+  line-height: 1.4;
+  text-align: left;
+  white-space: normal;
+  padding: 0.35em 0.75em;
+  border: 1.5px solid var(--paper-line);
+  border-radius: 999px;
+  background: #fffdf4;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.chat-suggest-btn:hover {
+  border-color: #8a6a4c;
+}
+
 .chat-loading {
   padding: 0 1em 0.5em;
   font-size: clamp(10px, 1.1vw, 13px);

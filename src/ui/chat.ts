@@ -25,6 +25,11 @@ export function mountChat(options: ChatOptions): ChatPanel {
       <p class="chat-now"></p>
       <div class="chat-log"></div>
       <p class="chat-loading" hidden>小黄鸭想了想…</p>
+      <div class="chat-suggest" hidden>
+        <button type="button" class="chat-suggest-btn">你刚才在干嘛？</button>
+        <button type="button" class="chat-suggest-btn">写代码卡住了，帮我理一理</button>
+        <button type="button" class="chat-suggest-btn">最近出去玩有什么新鲜事？</button>
+      </div>
       <form class="chat-form">
         <input type="text" maxlength="500" placeholder="跟它说点什么…" aria-label="聊天输入" />
         <button type="submit">发送</button>
@@ -36,6 +41,7 @@ export function mountChat(options: ChatOptions): ChatPanel {
   const log = overlay.querySelector<HTMLElement>('.chat-log')!;
   const nowLine = overlay.querySelector<HTMLElement>('.chat-now')!;
   const loading = overlay.querySelector<HTMLElement>('.chat-loading')!;
+  const suggest = overlay.querySelector<HTMLElement>('.chat-suggest')!;
   const form = overlay.querySelector<HTMLFormElement>('.chat-form')!;
   const input = overlay.querySelector<HTMLInputElement>('input')!;
   const history: ChatTurn[] = [];
@@ -68,14 +74,13 @@ export function mountChat(options: ChatOptions): ChatPanel {
     if (e.key === 'Escape' && !overlay.hidden) close();
   });
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const message = input.value.trim();
+  async function send(message: string): Promise<void> {
     if (!message || busy) return;
     busy = true;
     input.value = '';
     input.disabled = true;
     append('user', message);
+    suggest.hidden = true;
     loading.hidden = false;
     const context = options.getContext();
     refreshNow(context);
@@ -87,12 +92,21 @@ export function mountChat(options: ChatOptions): ChatPanel {
     busy = false;
     input.disabled = false;
     input.focus();
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    void send(input.value.trim());
   });
+  for (const button of overlay.querySelectorAll<HTMLButtonElement>('.chat-suggest-btn')) {
+    button.addEventListener('click', () => void send(button.textContent?.trim() ?? ''));
+  }
 
   return {
     open() {
       overlay.hidden = false;
       refreshNow();
+      suggest.hidden = log.children.length > 0;
       input.focus();
     },
   };
