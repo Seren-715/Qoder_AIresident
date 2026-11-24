@@ -52,6 +52,7 @@ export function mountScene(root: HTMLElement): void {
         <div class="duck" role="button" tabindex="0" aria-label="和小黄鸭聊天">
           <div class="bubble"></div>
           <img class="duck-img" alt="小黄鸭" />
+          <span class="duck-tag">点我聊聊</span>
         </div>
         <div class="duck-hit" aria-hidden="true"></div>
         <div class="props props-front"></div>
@@ -60,8 +61,8 @@ export function mountScene(root: HTMLElement): void {
         <button type="button" class="hotspot hotspot-photo-wall" aria-label="看看明信片"><span class="hotspot-tag">看看明信片</span></button>
         <button type="button" class="hotspot hotspot-mailbox" aria-label="信箱"><span class="hotspot-tag">信箱</span><span class="mail-dot" hidden></span></button>
         <button type="button" class="hotspot hotspot-signpost" aria-label="路牌"><span class="hotspot-tag">建议它出去走走</span></button>
-        <img class="road-duck" alt="" hidden />
-        <div class="travel-note" hidden><span class="travel-note-text"></span></div>
+        <img class="road-duck" alt="" role="button" tabindex="0" aria-label="和小黄鸭聊天" hidden />
+        <div class="travel-note" role="button" tabindex="0" aria-label="和小黄鸭聊天" hidden><span class="travel-note-text"></span></div>
         <div class="chrome">
           <div class="note cal-note">
             <div class="cal-time">--:--</div>
@@ -266,11 +267,17 @@ export function mountScene(root: HTMLElement): void {
   function renderLife(message: string | null = null): void {
     const activity = life.activity;
     if (activity?.kind === 'travel') {
-      // 出门旅行中：屋里看不到鸭子，只留一个气泡。
+      // 出门旅行中：鸭子、点击区都藏起来，别挡住门；只在有回复时留一个气泡。
       setDuck(FURNITURE.door.anchor, 'sit', message ?? '');
       duckImg.style.display = 'none';
+      duckHit.style.display = 'none';
+      duck.style.visibility = 'hidden';
+      bubble.style.visibility = 'visible';
     } else {
       duckImg.style.display = '';
+      duckHit.style.display = '';
+      duck.style.visibility = '';
+      bubble.style.visibility = '';
       const furniture = activity ? ACTIVITIES[activity.kind].furniture : undefined;
       const spot = furniture ? FURNITURE[furniture] : undefined;
       if (spot?.action) {
@@ -447,6 +454,20 @@ export function mountScene(root: HTMLElement): void {
     awayBody.textContent = awaySummary.body;
     away.hidden = false;
   }
+  travelNote.addEventListener('click', () => chat.open());
+  travelNote.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      chat.open();
+    }
+  });
+  roadDuck.addEventListener('click', () => chat.open());
+  roadDuck.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      chat.open();
+    }
+  });
   duckHit.addEventListener('click', () => chat.open());
   duck.addEventListener('click', () => chat.open());
   duck.addEventListener('keydown', (e) => {

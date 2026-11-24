@@ -45,6 +45,7 @@ export function mountPostcards(options: PostcardOptions): PostcardPanel {
         <p class="album-empty" hidden>还没有明信片，等它出门旅行吧。</p>
       </div>
       <div class="postcard-actions">
+        <button type="button" class="postcard-back" hidden>返回相册</button>
         <button type="button" class="postcard-next" hidden>下一张</button>
         <button type="button" class="postcard-close-btn">合上</button>
       </div>
@@ -60,6 +61,7 @@ export function mountPostcards(options: PostcardOptions): PostcardPanel {
   const text = overlay.querySelector<HTMLElement>('.postcard-text')!;
   const sign = overlay.querySelector<HTMLElement>('.postcard-sign')!;
   const nextBtn = overlay.querySelector<HTMLButtonElement>('.postcard-next')!;
+  const backBtn = overlay.querySelector<HTMLButtonElement>('.postcard-back')!;
   const grid = overlay.querySelector<HTMLElement>('.album-grid')!;
   const albumCount = overlay.querySelector<HTMLElement>('.album-count')!;
   const albumEmpty = overlay.querySelector<HTMLElement>('.album-empty')!;
@@ -78,7 +80,7 @@ export function mountPostcards(options: PostcardOptions): PostcardPanel {
     album.hidden = true;
   }
 
-  function renderTrip(trip: Trip): void {
+  function renderTrip(trip: Trip, fromAlbum = false): void {
     const destination = DESTINATIONS.find((d) => d.id === trip.destinationId);
     showSingle();
     if (destination) {
@@ -97,6 +99,7 @@ export function mountPostcards(options: PostcardOptions): PostcardPanel {
     postmarkDate.textContent = formatShortDate(trip.returnedAt);
     options.onRead(trip.id);
     nextBtn.hidden = queue.length === 0;
+    backBtn.hidden = !fromAlbum;
     overlay.hidden = false;
   }
 
@@ -112,6 +115,7 @@ export function mountPostcards(options: PostcardOptions): PostcardPanel {
     const trips = options.getTrips().slice().sort((a, b) => b.returnedAt - a.returnedAt);
     single.hidden = true;
     album.hidden = false;
+    backBtn.hidden = true;
     grid.textContent = '';
     albumEmpty.hidden = trips.length > 0;
     const visited = visitedCount(trips.map((trip) => trip.destinationId));
@@ -134,7 +138,7 @@ export function mountPostcards(options: PostcardOptions): PostcardPanel {
       if (!trip.read) item.classList.add('is-unread');
       item.addEventListener('click', () => {
         queue = [];
-        renderTrip(trip);
+        renderTrip(trip, true);
       });
       grid.appendChild(item);
     }
@@ -145,6 +149,7 @@ export function mountPostcards(options: PostcardOptions): PostcardPanel {
     const trip = queue.shift();
     if (trip) renderTrip(trip);
   });
+  backBtn.addEventListener('click', renderAlbum);
   overlay.querySelector('.postcard-close')!.addEventListener('click', close);
   overlay.querySelector('.postcard-close-btn')!.addEventListener('click', close);
   overlay.addEventListener('click', (e) => {

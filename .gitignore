@@ -33,3 +33,6 @@ __pycache__/
 /library_file_transfer.py
 /library_hosted_apps.py
 /*.b64
+
+# 生图中间产物（定稿在 public/ 下，不再提交原图）
+vibe_images/
