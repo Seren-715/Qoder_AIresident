@@ -163,6 +163,7 @@ export function mountPostcards(options: PostcardOptions): PostcardPanel {
   }
 
   function renderAlbum(): void {
+    currentTripId = null;
     const trips = options.getTrips().slice().sort((a, b) => b.returnedAt - a.returnedAt);
     single.hidden = true;
     album.hidden = false;

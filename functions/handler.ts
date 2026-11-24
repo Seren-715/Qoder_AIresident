@@ -317,7 +317,7 @@ function allowRequest(request: Request): boolean {
   dailyLimit.count += 1;
   if (ipWindows.size > 1000) {
     for (const [otherIp, stamps] of ipWindows) {
-      if (stamps.length === 0) ipWindows.delete(otherIp);
+      if (stamps.every((at) => now - at >= RATE_WINDOW_MS)) ipWindows.delete(otherIp);
     }
   }
   return true;
@@ -326,7 +326,8 @@ function allowRequest(request: Request): boolean {
 /** 线上只接受同源页面或 *.qoder.zone 发起的请求；本地 http 不拦截。 */
 function isOriginAllowed(request: Request): boolean {
   const url = new URL(request.url);
-  if (url.protocol !== 'https:') return true;
+  const forwardedProto = request.headers.get('x-forwarded-proto')?.trim().toLowerCase();
+  if (url.protocol !== 'https:' && forwardedProto !== 'https') return true;
   const candidate = request.headers.get('origin') ?? request.headers.get('referer');
   if (!candidate) return false;
   let parsed: URL;
@@ -335,7 +336,8 @@ function isOriginAllowed(request: Request): boolean {
   } catch {
     return false;
   }
-  if (parsed.origin === url.origin) return true;
+  if (parsed.protocol !== 'https:') return false;
+  if (parsed.host === url.host) return true;
   return parsed.hostname.endsWith('.qoder.zone');
 }
 

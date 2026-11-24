@@ -182,6 +182,7 @@ body {
 }
 
 .duck:hover .duck-img,
+.duck.is-hovered .duck-img,
 .duck:focus-visible .duck-img,
 .hints-on .duck-img {
   filter: drop-shadow(0 0 6px rgba(255, 236, 170, 0.95)) drop-shadow(0 0 18px rgba(255, 220, 130, 0.65));
@@ -208,6 +209,7 @@ body {
 }
 
 .duck:hover .duck-tag,
+.duck.is-hovered .duck-tag,
 .duck:focus-visible .duck-tag,
 .hints-on .duck-tag {
   opacity: 1;

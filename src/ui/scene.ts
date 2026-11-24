@@ -274,9 +274,10 @@ export function mountScene(root: HTMLElement): void {
       duckHit.style.display = 'none';
       duck.style.visibility = 'hidden';
       bubble.style.visibility = 'visible';
+      duck.classList.remove('is-hovered');
     } else {
       duckImg.style.display = '';
-      duckHit.style.display = '';
+      duckHit.style.display = currentScene === 'interior' ? '' : 'none';
       duck.style.visibility = '';
       bubble.style.visibility = '';
       const furniture = activity ? ACTIVITIES[activity.kind].furniture : undefined;
@@ -401,6 +402,7 @@ export function mountScene(root: HTMLElement): void {
 
   function show(id: SceneId): void {
     currentScene = id;
+    duck.classList.remove('is-hovered');
     bg.src = assetUrl(sceneBackground(id));
     renderProps(propsBack, propsFront, id, reducedMotion.matches);
     water.setScene(id);
@@ -457,6 +459,11 @@ export function mountScene(root: HTMLElement): void {
     awayBody.textContent = awaySummary.body;
     away.hidden = false;
   }
+  function setDuckHover(on: boolean): void {
+    duck.classList.toggle('is-hovered', on);
+  }
+  duckHit.addEventListener('mouseenter', () => setDuckHover(true));
+  duckHit.addEventListener('mouseleave', () => setDuckHover(false));
   travelNote.addEventListener('click', () => chat.open());
   travelNote.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
