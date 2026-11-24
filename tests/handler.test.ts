@@ -246,4 +246,118 @@ describe('聊天 Function', () => {
       ).status,
     ).toBe(400);
   });
+
+});
+
+describe('明信片 Function', () => {
+  const TRIP = {
+    destination: '乌镇',
+    region: '浙江嘉兴',
+    facts: ['乌镇是江南水乡古镇。', '河上有乌篷船和很多石桥。'],
+    departedLabel: '11 月 22 日 09:20',
+    returnedLabel: '11 月 22 日 16:05',
+    hours: 6.75,
+  };
+
+  function upstreamText(content: string): void {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        new Response(JSON.stringify({ choices: [{ message: { content } }] }), {
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    );
+  }
+
+  function systemPrompt(): string {
+    const sent = JSON.parse(
+      (vi.mocked(fetch).mock.calls[0][1] as RequestInit).body as string,
+    );
+    return sent.messages[0].content as string;
+  }
+
+  it('成功时返回正文，提示词带上事实和规则', async () => {
+    setKey('test-key');
+    upstreamText('我在乌镇坐了一下午乌篷船。');
+    const res = await handler(post({ operation: 'postcard', trip: TRIP }));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true, text: '我在乌镇坐了一下午乌篷船。' });
+
+    const system = systemPrompt();
+    expect(system).toContain('乌镇是江南水乡古镇。');
+    expect(system).toContain('河上有乌篷船和很多石桥。');
+    expect(system).toContain('地点：乌镇（浙江嘉兴）');
+    expect(system).toContain('在外：6.75 小时');
+    expect(system).toContain('不超过 100 字');
+    expect(system).toContain('只能写下面 facts 里的景物和事实');
+    expect(system).toContain('不写具体的票价、营业时间、天气数据、新闻或其他实时信息');
+    expect(system).toContain('只输出正文，不要标题、引号或署名');
+
+    const sent = JSON.parse(
+      (vi.mocked(fetch).mock.calls[0][1] as RequestInit).body as string,
+    );
+    expect(sent.messages.at(-1)).toEqual({ role: 'user', content: '请写这张明信片。' });
+  });
+
+  it('可选上下文仍按聊天规则校验', async () => {
+    setKey('test-key');
+    upstreamText('乌篷船摇得很稳。');
+    const ok = await handler(post({ operation: 'postcard', trip: TRIP, context: CONTEXT }));
+    expect(ok.status).toBe(200);
+    expect(systemPrompt()).toContain('名字：Qoduck');
+
+    const bad = await handler(
+      post({ operation: 'postcard', trip: TRIP, context: { ...CONTEXT, name: 'x'.repeat(21) } }),
+    );
+    expect(bad.status).toBe(400);
+  });
+
+  it('入参不合法时返回 400', async () => {
+    setKey('test-key');
+    const cases: unknown[] = [
+      { operation: 'postcard' },
+      { operation: 'postcard', trip: { ...TRIP, destination: '' } },
+      { operation: 'postcard', trip: { ...TRIP, destination: 'x'.repeat(13) } },
+      { operation: 'postcard', trip: { ...TRIP, region: '' } },
+      { operation: 'postcard', trip: { ...TRIP, region: 'x'.repeat(17) } },
+      { operation: 'postcard', trip: { ...TRIP, facts: [] } },
+      { operation: 'postcard', trip: { ...TRIP, facts: Array(5).fill('一条事实') } },
+      { operation: 'postcard', trip: { ...TRIP, facts: ['x'.repeat(61)] } },
+      { operation: 'postcard', trip: { ...TRIP, departedLabel: '' } },
+      { operation: 'postcard', trip: { ...TRIP, returnedLabel: 'x'.repeat(33) } },
+      { operation: 'postcard', trip: { ...TRIP, hours: 0 } },
+      { operation: 'postcard', trip: { ...TRIP, hours: -1 } },
+      { operation: 'postcard', trip: { ...TRIP, hours: '6' } },
+      { operation: 'postcard', trip: { ...TRIP, hours: 24 * 8 } },
+    ];
+    for (const body of cases) {
+      expect((await handler(post(body))).status, JSON.stringify(body)).toBe(400);
+    }
+  });
+
+  it('超过 100 字按最后一个句末标点截断', async () => {
+    setKey('test-key');
+    upstreamText('甲'.repeat(80) + '。' + '乙'.repeat(40));
+    const res = await handler(post({ operation: 'postcard', trip: TRIP }));
+    expect(res.status).toBe(200);
+    const data = (await res.json()) as { text: string };
+    expect([...data.text]).toHaveLength(81);
+    expect(data.text.endsWith('。')).toBe(true);
+
+    upstreamText('丙'.repeat(120));
+    const cut = await handler(post({ operation: 'postcard', trip: TRIP }));
+    const body = (await cut.json()) as { text: string };
+    expect([...body.text]).toHaveLength(100);
+  });
+
+  it('拒答词视为不合格，返回 502 让前端保留模板', async () => {
+    setKey('test-key');
+    for (const reply of ['我无法完成这个请求。', '作为 AI，我不能提供这类内容。', '不能提供这个。']) {
+      upstreamText(reply);
+      const res = await handler(post({ operation: 'postcard', trip: TRIP }));
+      expect(res.status).toBe(502);
+      expect(await res.json()).toEqual({ ok: false, code: 'postcard_rejected' });
+    }
+  });
 });

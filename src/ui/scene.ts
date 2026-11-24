@@ -25,6 +25,7 @@ import {
 import { catchUpLife, catchUpTarget, summarizeAway, type AwaySummary } from '../sim/offline';
 import { formatClock, formatDateLabel, toGameMinute } from '../sim/time';
 import { clearLife, DEFAULT_NAME, loadLife, saveLife } from '../storage/life';
+import { clearPostcards } from '../storage/postcards';
 import { mountChat } from './chat';
 import { mountPostcards } from './postcards';
 import { mountSettings } from './settings';
@@ -314,6 +315,7 @@ export function mountScene(root: HTMLElement): void {
 
   function restart(): void {
     clearLife();
+    clearPostcards();
     name = DEFAULT_NAME;
     life = createInitialLife({
       seed: newSeed(),
@@ -422,6 +424,7 @@ export function mountScene(root: HTMLElement): void {
   const postcards = mountPostcards({
     getTrips: () => life.trips,
     getName: () => name,
+    getContext: () => buildChatContext(life, name, awaySummaryText),
     onRead: (tripId) => {
       const next = markTripRead(life, tripId);
       if (next === life) return;

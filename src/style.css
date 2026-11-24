@@ -1150,6 +1150,11 @@ body {
   line-height: 1.9;
   color: var(--ink);
   white-space: pre-wrap;
+  transition: opacity 0.18s ease;
+}
+
+.postcard-text.is-swapping {
+  opacity: 0;
 }
 
 .postcard-sign {

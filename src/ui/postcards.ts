@@ -1,14 +1,21 @@
+import { sendPostcard } from '../ai/client';
+import type { ChatContext } from '../ai/context';
+import { startPostcardStory } from '../ai/postcard';
 import { pickTemplate, visitedCount } from '../data/postcards';
 import { assetUrl } from '../data/scene';
 import { DESTINATIONS } from '../data/travel';
 import type { Trip } from '../sim/life';
-import { formatShortDate } from '../sim/time';
+import { formatGameTime, formatShortDate } from '../sim/time';
+import { loadAiConfig } from '../storage/settings';
+import { loadPostcardCache, savePostcardStory, type PostcardStoryEntry } from '../storage/postcards';
 
 export interface PostcardOptions {
   getTrips: () => Trip[];
   getName: () => string;
   /** 打开一张明信片时调用，用来把 Trip 标记成已读。 */
   onRead: (tripId: string) => void;
+  /** 给模型的聊天上下文（名字、现在、最近）。 */
+  getContext: () => ChatContext;
 }
 
 export interface PostcardPanel {
@@ -66,6 +73,8 @@ export function mountPostcards(options: PostcardOptions): PostcardPanel {
   const albumCount = overlay.querySelector<HTMLElement>('.album-count')!;
   const albumEmpty = overlay.querySelector<HTMLElement>('.album-empty')!;
   let queue: Trip[] = [];
+  let currentTripId: string | null = null;
+  let swapTimer: number | null = null;
 
   function tripName(trip: Trip): string {
     return DESTINATIONS.find((d) => d.id === trip.destinationId)?.name ?? '远方';
@@ -73,6 +82,7 @@ export function mountPostcards(options: PostcardOptions): PostcardPanel {
 
   function close(): void {
     overlay.hidden = true;
+    currentTripId = null;
   }
 
   function showSingle(): void {
@@ -80,27 +90,68 @@ export function mountPostcards(options: PostcardOptions): PostcardPanel {
     album.hidden = true;
   }
 
+  function setStory(tripId: string, entry: PostcardStoryEntry): void {
+    if (currentTripId !== tripId) return;
+    if (text.textContent === entry.text) return;
+    if (swapTimer !== null) window.clearTimeout(swapTimer);
+    text.classList.add('is-swapping');
+    swapTimer = window.setTimeout(() => {
+      swapTimer = null;
+      if (currentTripId !== tripId) return;
+      text.textContent = entry.text;
+      text.classList.remove('is-swapping');
+    }, 180);
+  }
+
   function renderTrip(trip: Trip, fromAlbum = false): void {
     const destination = DESTINATIONS.find((d) => d.id === trip.destinationId);
     showSingle();
-    if (destination) {
-      image.src = assetUrl(destination.image.replace(/^\/+/, ''));
-      image.alt = destination.name;
-      text.textContent = pickTemplate(trip.id, destination.templates);
-      postmarkName.textContent = destination.name;
-      sign.textContent = `—— ${options.getName()}`;
-    } else {
-      image.removeAttribute('src');
-      image.alt = '';
-      text.textContent = '这次旅行太远了，只记得一路上的风。';
-      postmarkName.textContent = '远方';
-      sign.textContent = `—— ${options.getName()}`;
-    }
+    currentTripId = trip.id;
+    if (swapTimer !== null) window.clearTimeout(swapTimer);
+    swapTimer = null;
+    text.classList.remove('is-swapping');
     postmarkDate.textContent = formatShortDate(trip.returnedAt);
     options.onRead(trip.id);
     nextBtn.hidden = queue.length === 0;
     backBtn.hidden = !fromAlbum;
     overlay.hidden = false;
+
+    if (!destination) {
+      image.removeAttribute('src');
+      image.alt = '';
+      text.textContent = '这次旅行太远了，只记得一路上的风。';
+      postmarkName.textContent = '远方';
+      sign.textContent = `—— ${options.getName()}`;
+      return;
+    }
+
+    const template = pickTemplate(trip.id, destination.templates);
+    const job = startPostcardStory({
+      tripId: trip.id,
+      template,
+      cached: loadPostcardCache()[trip.id],
+      request: () =>
+        sendPostcard(
+          {
+            destination: destination.name,
+            region: destination.region,
+            facts: destination.facts,
+            departedLabel: formatGameTime(trip.departedAt),
+            returnedLabel: formatGameTime(trip.returnedAt),
+            hours: Math.round(((trip.returnedAt - trip.departedAt) / 60) * 100) / 100,
+          },
+          loadAiConfig(),
+          options.getContext(),
+        ),
+      isCurrent: () => currentTripId === trip.id && !overlay.hidden,
+      onUpdate: (entry) => setStory(trip.id, entry),
+      save: savePostcardStory,
+    });
+    image.src = assetUrl(destination.image.replace(/^\/+/, ''));
+    image.alt = destination.name;
+    text.textContent = job.initial.text;
+    postmarkName.textContent = destination.name;
+    sign.textContent = `—— ${options.getName()}`;
   }
 
   function unreadTrips(): Trip[] {
