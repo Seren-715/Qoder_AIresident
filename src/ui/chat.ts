@@ -1,5 +1,6 @@
 import { sendChat, type ChatTurn } from '../ai/client';
 import type { ChatContext } from '../ai/context';
+import { loadChatHistory, saveChatHistory } from '../storage/chat';
 import { loadAiConfig } from '../storage/settings';
 
 export interface ChatPanel {
@@ -44,7 +45,7 @@ export function mountChat(options: ChatOptions): ChatPanel {
   const suggest = overlay.querySelector<HTMLElement>('.chat-suggest')!;
   const form = overlay.querySelector<HTMLFormElement>('.chat-form')!;
   const input = overlay.querySelector<HTMLInputElement>('input')!;
-  const history: ChatTurn[] = [];
+  const history: ChatTurn[] = loadChatHistory();
   let busy = false;
 
   function append(role: ChatTurn['role'], content: string): void {
@@ -54,6 +55,8 @@ export function mountChat(options: ChatOptions): ChatPanel {
     log.appendChild(el);
     log.scrollTop = log.scrollHeight;
   }
+
+  for (const turn of history) append(turn.role, turn.content);
 
   function refreshNow(context = options.getContext()): void {
     const activity = context.now.activity.startsWith('在')
@@ -88,6 +91,7 @@ export function mountChat(options: ChatOptions): ChatPanel {
     loading.hidden = true;
     append('assistant', reply);
     history.push({ role: 'user', content: message }, { role: 'assistant', content: reply });
+    saveChatHistory(history);
     refreshNow();
     busy = false;
     input.disabled = false;

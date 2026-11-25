@@ -9,6 +9,7 @@ import { assetUrl, type SceneId } from '../data/scene';
 function buildProp(spec: PropSpec, reduced: boolean): HTMLImageElement {
   const img = document.createElement('img');
   img.className = 'prop';
+  img.dataset.propId = spec.id;
   img.alt = '';
   img.src = assetUrl(spec.image);
   img.style.left = `${spec.left}%`;

@@ -148,6 +148,25 @@ body {
   }
 }
 
+.scene-tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+  background-color: transparent;
+  transition: background-color 0.9s linear;
+}
+
+.prop[data-prop-id="lantern"],
+.prop[data-prop-id="door-lantern"] {
+  transition: filter 0.9s ease;
+}
+
+.scene.is-night .prop[data-prop-id="lantern"],
+.scene.is-night .prop[data-prop-id="door-lantern"] {
+  filter: brightness(1.25) drop-shadow(0 0 8px rgba(255, 200, 110, 0.8));
+}
+
 .water-canvas {
   position: absolute;
   inset: 0;
@@ -1410,6 +1429,12 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .prop {
     animation: none;
+  }
+
+  .scene-tint,
+  .prop[data-prop-id="lantern"],
+  .prop[data-prop-id="door-lantern"] {
+    transition: none;
   }
 
   .cal-bar i,

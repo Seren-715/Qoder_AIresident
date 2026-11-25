@@ -12,6 +12,7 @@ import {
   type FurnitureId,
   type SceneId,
 } from '../data/scene';
+import { activityLine, travelReturnLine } from '../data/chatter';
 import { DESTINATIONS } from '../data/travel';
 import { createClock, setClockSpeed, SPEEDS, tickClock, type GameClock, type Speed } from '../sim/clock';
 import {
@@ -24,12 +25,14 @@ import {
 } from '../sim/life';
 import { catchUpLife, catchUpTarget, summarizeAway, type AwaySummary } from '../sim/offline';
 import { formatClock, formatDateLabel, toGameMinute } from '../sim/time';
+import { clearChatHistory } from '../storage/chat';
 import { clearLife, DEFAULT_NAME, loadLife, saveLife } from '../storage/life';
 import { clearPostcards } from '../storage/postcards';
 import { mountChat } from './chat';
 import { mountPostcards } from './postcards';
 import { mountSettings } from './settings';
 import { renderProps, sceneBackground } from './props';
+import { tintCss, tintForMinute } from './tint';
 import { mountWater, type WaterController } from './water';
 
 const SPEED_LABELS: Record<Speed, string> = { 1: '×1', 60: '×60', 600: '×600' };
@@ -49,6 +52,7 @@ export function mountScene(root: HTMLElement): void {
       <div class="scene" role="group" aria-label="小黄鸭的树洞小屋">
         <img class="scene-bg" alt="" />
         <canvas class="water-canvas" aria-hidden="true"></canvas>
+        <div class="scene-tint" aria-hidden="true"></div>
         <div class="props props-back"></div>
         <div class="duck" role="button" tabindex="0" aria-label="和小黄鸭聊天">
           <div class="bubble"></div>
@@ -106,6 +110,7 @@ export function mountScene(root: HTMLElement): void {
   const chromeEl = root.querySelector<HTMLElement>('.chrome')!;
   const bg = root.querySelector<HTMLImageElement>('.scene-bg')!;
   const waterCanvas = root.querySelector<HTMLCanvasElement>('.water-canvas')!;
+  const tintEl = root.querySelector<HTMLElement>('.scene-tint')!;
   const propsBack = root.querySelector<HTMLElement>('.props-back')!;
   const propsFront = root.querySelector<HTMLElement>('.props-front')!;
   const door = root.querySelector<HTMLButtonElement>('.hotspot-door')!;
@@ -181,6 +186,10 @@ export function mountScene(root: HTMLElement): void {
       saveId: newSaveId(),
     });
   }
+  let chatterText: string | null = null;
+  let chatterTimer: number | null = null;
+  let lastActivityId: string | null = life.activity?.id ?? null;
+  let lastTripCount = life.trips.length;
   let clock: GameClock = createClock(life.minute, Date.now());
   const water: WaterController = mountWater(waterCanvas, bg, 'interior', reducedMotion.matches);
 
@@ -193,7 +202,31 @@ export function mountScene(root: HTMLElement): void {
     bubble.textContent = text;
   }
 
+  function noteActivityChange(): void {
+    const id = life.activity?.id ?? null;
+    if (id === lastActivityId) return;
+    lastActivityId = id;
+    const returned = life.trips.length > lastTripCount;
+    lastTripCount = life.trips.length;
+    const activity = life.activity;
+    if (!activity) return;
+    const line =
+      returned && activity.kind !== 'travel'
+        ? travelReturnLine(activity.id)
+        : activityLine(activity.kind, activity.id);
+    chatterText = line;
+    if (chatterTimer !== null) window.clearTimeout(chatterTimer);
+    chatterTimer = window.setTimeout(() => {
+      chatterTimer = null;
+      chatterText = null;
+      renderLife();
+    }, 6000);
+  }
+
   function renderChrome(): void {
+    const tint = tintForMinute(life.minute);
+    tintEl.style.backgroundColor = tintCss(tint);
+    sceneEl.classList.toggle('is-night', tint.opacity >= 0.25);
     calTime.textContent = formatClock(life.minute);
     calDate.textContent = formatDateLabel(life.minute);
 
@@ -266,10 +299,12 @@ export function mountScene(root: HTMLElement): void {
   }
 
   function renderLife(message: string | null = null): void {
+    noteActivityChange();
     const activity = life.activity;
+    const line = message ?? chatterText;
     if (activity?.kind === 'travel') {
       // 出门旅行中：鸭子、点击区都藏起来，别挡住门；只在有回复时留一个气泡。
-      setDuck(FURNITURE.door.anchor, 'sit', message ?? '');
+      setDuck(FURNITURE.door.anchor, 'sit', line ?? '');
       duckImg.style.display = 'none';
       duckHit.style.display = 'none';
       duck.style.visibility = 'hidden';
@@ -283,12 +318,12 @@ export function mountScene(root: HTMLElement): void {
       const furniture = activity ? ACTIVITIES[activity.kind].furniture : undefined;
       const spot = furniture ? FURNITURE[furniture] : undefined;
       if (spot?.action) {
-        setDuck(spot.anchor, spot.action.pose, message ?? spot.action.bubble);
+        setDuck(spot.anchor, spot.action.pose, line ?? spot.action.bubble);
       } else {
         setDuck(
           FURNITURE[IDLE_SPOT.furniture].anchor,
           IDLE_SPOT.pose,
-          message ?? IDLE_SPOT.bubble,
+          line ?? IDLE_SPOT.bubble,
         );
       }
     }
@@ -317,12 +352,20 @@ export function mountScene(root: HTMLElement): void {
   function restart(): void {
     clearLife();
     clearPostcards();
+    clearChatHistory();
+    if (chatterTimer !== null) {
+      window.clearTimeout(chatterTimer);
+      chatterTimer = null;
+    }
+    chatterText = null;
     name = DEFAULT_NAME;
     life = createStarterLife({
       seed: newSeed(),
       atMinute: toGameMinute(Date.now()),
       saveId: newSaveId(),
     });
+    lastActivityId = life.activity?.id ?? null;
+    lastTripCount = life.trips.length;
     clock = createClock(life.minute, Date.now());
     away.hidden = true;
     awaySummaryText = null;
